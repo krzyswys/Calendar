@@ -60,7 +60,7 @@ class Events(models.Model):
     Duration = models.DurationField()
     CreationDate = models.DateTimeField(default=datetime.now)
     Color = models.CharField(max_length=3)
-    #FirstOccurence
+    # FirstOccurence
 
     def __str__(self):
         return self.Name
@@ -104,8 +104,8 @@ class Tasks(models.Model):
     AcceptableSlideTime = models.DurationField()
 
     class StatusOptions(models.IntegerChoices):
-        (0, 'Not finished'),
-        (1, 'Finished')
+        (0, "Not finished"),
+        (1, "Finished")
 
     Status = models.IntegerField(choices=StatusOptions)
 
@@ -118,3 +118,11 @@ class TaskOccurrences(models.Model):
     Task = models.ForeignKey(Tasks, on_delete=models.CASCADE)
     StartTime = models.DateTimeField()
 
+
+class Notes(models.Model):
+    NoteID = models.BigAutoField(primary_key=True)
+    Creator = models.ForeignKey(Users, on_delete=models.CASCADE)
+    Contents = models.CharField(max_length=4000)
+    DateOfCreation = models.DateTimeField()
+    ModificationDate = models.DateTimeField()
+    PriorityLevel = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
