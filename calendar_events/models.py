@@ -1,17 +1,12 @@
 from datetime import timedelta
 from datetime import datetime
-<<<<<<< HEAD
-=======
 from dateutil.relativedelta import relativedelta
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 from django.db import models
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 import calendar_events.models as md
 import exceptions as e
 
-<<<<<<< HEAD
-=======
 from django.shortcuts import render
 
 # FIXME: instead of default values == "", set placeholders?
@@ -55,7 +50,6 @@ def index(request):
 
     return render(request, "index.html", context)
 
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 class Users(models.Model):
     user_id = models.BigAutoField(primary_key=True)
@@ -76,20 +70,12 @@ class Users(models.Model):
             user.save()
             return user
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('User with specified login already exists')
-=======
             raise e.EntityAlreadyExists("User with specified login already exists")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
     @staticmethod
     def get_user(user_id: int = None, login: str = None):
         if user_id is None and login is None:
-<<<<<<< HEAD
-            raise e.NoDataGiven('Need to specify id or login')
-=======
             raise e.NoDataGiven("Need to specify id or login")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             if user_id is not None:
@@ -97,12 +83,7 @@ class Users(models.Model):
             else:
                 return md.Users.objects.get(login=login)
         except ObjectDoesNotExist:
-<<<<<<< HEAD
-            raise e.EntityNotFound('Cannot find specified user')
-
-=======
             raise e.EntityNotFound("Cannot find specified user")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
     def modify(self, new_login: str):
         if new_login is None:
@@ -114,11 +95,7 @@ class Users(models.Model):
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('User with specified login already exists!')
-=======
             raise e.EntityAlreadyExists("User with specified login already exists!")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 class PriorityLevels(models.Model):
@@ -130,20 +107,6 @@ class PriorityLevels(models.Model):
     default_reminder_time = models.DurationField()
 
     def __str__(self):
-<<<<<<< HEAD
-        return self.Name
-
-    @staticmethod
-    def create_priority_level(
-            user: md.Users,
-            name: str,
-            priority: int,
-            default_reminder_time: timedelta,
-            markdown: str = None
-    ):
-        if user is None or name is None or priority is None or default_reminder_time is None:
-            raise e.NoDataGiven('Need to specify all needed values')
-=======
         return self.name
 
     @staticmethod
@@ -161,7 +124,6 @@ class PriorityLevels(models.Model):
             or default_reminder_time is None
         ):
             raise e.NoDataGiven("Need to specify all needed values")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         priority_level = md.PriorityLevels()
         priority_level.priority_level_creator = user
@@ -178,14 +140,6 @@ class PriorityLevels(models.Model):
             priority_level.save()
             return priority_level
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create priority level')
-
-    @staticmethod
-    def get_priority_levels(pr_id: int = None, pr_name: str = None, user: md.Users = None):
-        if pr_id is None and pr_name is None and user is None:
-            raise e.NoDataGiven('Need to specify some values')
-=======
             raise e.EntityAlreadyExists("Cannot create priority level")
 
     @staticmethod
@@ -194,26 +148,12 @@ class PriorityLevels(models.Model):
     ):
         if pr_id is None and pr_name is None and user is None and value is None:
             raise e.NoDataGiven("Need to specify some values")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             if pr_id is not None:
                 return md.PriorityLevels.objects.get(priority_level_id=pr_id)
             elif pr_name is not None:
                 return md.PriorityLevels.objects.get(name=pr_name)
-<<<<<<< HEAD
-            else:
-                return md.PriorityLevels.objects.get(priority_level_creator=user.User)
-        except ObjectDoesNotExist:
-            raise e.EntityNotFound('Cannot find specified priority level')
-
-    def modify(
-            self,
-            name: str = None,
-            priority: int = None,
-            markdown: str = None,
-            default_reminder_time: timedelta = None,
-=======
             elif value is not None:
                 return md.PriorityLevels.objects.get(priority_value=value)
             else:
@@ -227,7 +167,6 @@ class PriorityLevels(models.Model):
         priority: int = None,
         markdown: str = None,
         default_reminder_time: timedelta = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         if name is not None:
             self.name = name
@@ -245,11 +184,7 @@ class PriorityLevels(models.Model):
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot save priority level')
-=======
             raise e.EntityAlreadyExists("Cannot save priority level")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 class EventCategories(models.Model):
@@ -264,20 +199,6 @@ class EventCategories(models.Model):
     default_color = models.CharField(max_length=6, blank=True)
 
     def __str__(self):
-<<<<<<< HEAD
-        return self.Name
-
-    @staticmethod
-    def create_event_category(
-            user: md.Users,
-            name: str,
-            default_priority_level: md.PriorityLevels,
-            default_duration_time: timedelta,
-            description: str = None,
-            default_localization: str = None,
-            default_color: str = None,
-            default_reminder_time: timedelta = None,
-=======
         return self.name
 
     @staticmethod
@@ -290,7 +211,6 @@ class EventCategories(models.Model):
         default_localization: str = None,
         default_color: str = None,
         default_reminder_time: timedelta = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         event_category = md.EventCategories()
         event_category.event_category_creator = user
@@ -316,32 +236,20 @@ class EventCategories(models.Model):
         if default_reminder_time is not None:
             event_category.default_reminder_time = default_reminder_time
         else:
-<<<<<<< HEAD
-            event_category.default_reminder_time = default_priority_level.DefaultReminderTime
-=======
             event_category.default_reminder_time = (
                 default_priority_level.DefaultReminderTime
             )
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             event_category.save()
             return event_category
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create event category')
-=======
             raise e.EntityAlreadyExists("Cannot create event category")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
     @staticmethod
     def get_event_category(cat_id: int = None, cat_name: str = None):
         if cat_id is None and cat_name is None:
-<<<<<<< HEAD
-            raise e.NoDataGiven('Need to specify some values')
-=======
             raise e.NoDataGiven("Need to specify some values")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             if cat_id is not None:
@@ -349,20 +257,6 @@ class EventCategories(models.Model):
             else:
                 return md.EventCategories.objects.get(name=cat_name)
         except ObjectDoesNotExist:
-<<<<<<< HEAD
-            raise e.EntityNotFound('Cannot find specified event category')
-
-
-    def modify(
-            self,
-            name: str = None,
-            description: str = None,
-            default_priority_level: md.PriorityLevels = None,
-            default_localization: str = None,
-            default_duration_time: timedelta = None,
-            default_color: str = None,
-            default_reminder_time: timedelta = None,
-=======
             raise e.EntityNotFound("Cannot find specified event category")
 
     def modify(
@@ -374,7 +268,6 @@ class EventCategories(models.Model):
         default_duration_time: timedelta = None,
         default_color: str = None,
         default_reminder_time: timedelta = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         if name is not None:
             self.name = name
@@ -401,11 +294,7 @@ class EventCategories(models.Model):
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot save event category')
-=======
             raise e.EntityAlreadyExists("Cannot save event category")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 class RepeatPatterns(models.Model):
@@ -423,15 +312,6 @@ class RepeatPatterns(models.Model):
 
     @staticmethod
     def create_repeat_pattern(
-<<<<<<< HEAD
-            user: md.Users,
-            name: str,
-            days_interval: int,
-            weeks_interval: int,
-            months_interval: int,
-            years_interval: int,
-            number_of_repetitions: int = 1
-=======
         user: md.Users,
         name: str,
         days_interval: int,
@@ -439,7 +319,6 @@ class RepeatPatterns(models.Model):
         months_interval: int,
         years_interval: int,
         number_of_repetitions: int = 1,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         repeat_pattern = md.RepeatPatterns()
         repeat_pattern.repeat_pattern_creator = user
@@ -451,30 +330,18 @@ class RepeatPatterns(models.Model):
         repeat_pattern.number_of_repetitions = number_of_repetitions
 
         if number_of_repetitions < 1:
-<<<<<<< HEAD
-            raise e.WrongNewData('Number of repetitions must be greater or equal to 1')
-=======
             raise e.WrongNewData("Number of repetitions must be greater or equal to 1")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             repeat_pattern.save()
             return repeat_pattern
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create repeat pattern')
-=======
             raise e.EntityAlreadyExists("Cannot create repeat pattern")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
     @staticmethod
     def get_repeat_pattern(rp_id: int = None, rp_name: str = None):
         if rp_id is None and rp_name is None:
-<<<<<<< HEAD
-            raise e.NoDataGiven('Need to specify some values')
-=======
             raise e.NoDataGiven("Need to specify some values")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             if rp_id is not None:
@@ -482,18 +349,6 @@ class RepeatPatterns(models.Model):
             else:
                 return md.RepeatPatterns.objects.get(name=rp_name)
         except ObjectDoesNotExist:
-<<<<<<< HEAD
-            raise e.EntityNotFound('Cannot find specified repeat pattern')
-
-    def modify(
-            self,
-            name: str = None,
-            days_interval: int = None,
-            weeks_interval: int = None,
-            months_interval: int = None,
-            years_interval: int = None,
-            number_of_repetitions: int = None
-=======
             raise e.EntityNotFound("Cannot find specified repeat pattern")
 
     def modify(
@@ -504,7 +359,6 @@ class RepeatPatterns(models.Model):
         months_interval: int = None,
         years_interval: int = None,
         number_of_repetitions: int = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         if name is not None:
             self.name = name
@@ -528,25 +382,6 @@ class RepeatPatterns(models.Model):
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot save repeat pattern')
-
-
-class Events(models.Model):
-    event_id = models.BigAutoField(primary_key=True)
-    event_creator = models.ForeignKey(Users, on_delete=models.CASCADE)
-    event_category = models.ForeignKey(EventCategories, on_delete=models.CASCADE)
-    priority_level = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
-    repeat_pattern = models.ForeignKey(RepeatPatterns, on_delete=models.CASCADE)
-    name = models.CharField(max_length=60)
-    description = models.CharField(max_length=500, blank=True)
-    reminder_time = models.DurationField()
-    localization = models.CharField(max_length=60)
-    duration = models.DurationField()
-    creation_date = models.DateTimeField(default=datetime.now)
-    color = models.CharField(max_length=6)
-    first_occurrence = models.DateTimeField()
-=======
             raise e.EntityAlreadyExists("Cannot save repeat pattern")
 
 
@@ -564,33 +399,12 @@ class Events(models.Model):
     CreationDate = models.DateTimeField(default=datetime.now)
     Color = models.CharField(max_length=3)
     FirstOccurence = models.DateTimeField(default=datetime.now)
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
     def __str__(self):
         return self.Name
 
     @staticmethod
     def create_event(
-<<<<<<< HEAD
-            user: md.Users,
-            event_category: md.EventCategories,
-            name: str,
-            repeat_pattern: md.RepeatPatterns,
-            first_occurrence: datetime,
-            description: str = None,
-            duration: timedelta = None,
-            priority_level: md.PriorityLevels = None,
-            reminder_time: timedelta = None,
-            localization: str = None,
-            color: str = None,
-    ):
-        event = md.Events()
-        event.event_creator = user
-        event.event_category = event_category
-        event.repeat_pattern = repeat_pattern
-        event.name = name
-        event.first_occurrence = first_occurrence
-=======
         user: md.Users,
         event_category: md.EventCategories,
         name: str,
@@ -610,7 +424,6 @@ class Events(models.Model):
         event.Name = name
         event.FirstOccurence = first_occurrence
         event.PriorityLevel = priority_level
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         if description is None:
             event.description = ""
@@ -618,15 +431,9 @@ class Events(models.Model):
             event.description = description
 
         if duration is None:
-<<<<<<< HEAD
-            event.duration = event_category.default_duration_time
-        else:
-            event.duration = duration
-=======
             event.Duration = event_category.default_duration_time
         else:
             event.Duration = duration
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         if priority_level is None:
             event.priority_level = event_category.default_priority_level
@@ -634,16 +441,6 @@ class Events(models.Model):
             event.priority_level = priority_level
 
         if reminder_time is None:
-<<<<<<< HEAD
-            event.reminder_time = event_category.default_reminder_time
-        else:
-            event.reminder_time = reminder_time
-
-        if localization is None:
-            event.localization = event_category.default_localization
-        else:
-            event.localization = localization
-=======
             event.ReminderTime = event_category.default_reminder_time
         else:
             event.ReminderTime = reminder_time
@@ -652,7 +449,6 @@ class Events(models.Model):
             event.Localization = event_category.default_localization
         else:
             event.Localization = localization
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         if color is None:
             event.color = event_category.default_color
@@ -663,14 +459,6 @@ class Events(models.Model):
             event.save()
             return event
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create event')
-
-    @staticmethod
-    def get_events(event_id: int = None, event_name: str = None, event_category: md.EventCategories = None, user: md.Users = None):
-        if event_id is None and event_name is None and event_category is None and user is None:
-            raise e.NoDataGiven('Need to specify some values')
-=======
             raise e.EntityAlreadyExists("Cannot create event")
 
     @staticmethod
@@ -687,7 +475,6 @@ class Events(models.Model):
             and user is None
         ):
             raise e.NoDataGiven("Need to specify some values")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             if event_id is not None:
@@ -705,22 +492,6 @@ class Events(models.Model):
 
                 return all_rows
         except ObjectDoesNotExist:
-<<<<<<< HEAD
-            raise e.EntityNotFound('Cannot find specified event')
-
-
-    def modify(
-    self,
-    event_category: md.EventCategories = None,
-    name: str = None,
-    description: str = None,
-    duration: timedelta = None,
-    repeat_pattern: md.RepeatPatterns = None,
-    priority_level: md.PriorityLevels = None,
-    reminder_time: timedelta = None,
-    localization: str = None,
-    color: str = None,
-=======
             raise e.EntityNotFound("Cannot find specified event")
 
     def modify(
@@ -734,7 +505,6 @@ class Events(models.Model):
         reminder_time: timedelta = None,
         localization: str = None,
         color: str = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         if event_category is not None:
             self.event_category = event_category
@@ -767,9 +537,6 @@ class Events(models.Model):
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot save event')
-=======
             raise e.EntityAlreadyExists("Cannot save event")
 
     @staticmethod
@@ -790,7 +557,6 @@ class Events(models.Model):
                 weeks=repeat_pattern.weeks_interval,
                 days=repeat_pattern.days_interval,
             )
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 class EventOccurrences(models.Model):
@@ -799,14 +565,7 @@ class EventOccurrences(models.Model):
     start_time = models.DateTimeField()
 
     @staticmethod
-<<<<<<< HEAD
-    def create_event_occurrence(
-            event: md.Events,
-            start_time: datetime
-    ):
-=======
     def create_event_occurrence(event: md.Events, start_time: datetime):
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
         event_occurrence = md.EventOccurrences()
         event_occurrence.event = event
         event_occurrence.start_time = start_time
@@ -815,32 +574,6 @@ class EventOccurrences(models.Model):
             event_occurrence.save()
             return event_occurrence
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create event occurrence')
-
-
-    @staticmethod
-    def get_event_occurrences(
-            id_event_occurrence: int = None,
-            event: md.Events = None
-    ):
-        if event is None and id_event_occurrence is None:
-            raise e.NoDataGiven('Need to specify event occurrence')
-
-        try:
-            if id_event_occurrence is not None:
-                return md.EventOccurrences.objects.get(event_occurrence_id=id_event_occurrence)
-            else:
-                return md.EventOccurrences.objects.get(event=event)
-        except ObjectDoesNotExist:
-            raise e.EntityNotFound('Cannot find specified event occurrences')
-
-
-    def modify(
-            self,
-            event: md.Events = None
-    ):
-=======
             raise e.EntityAlreadyExists("Cannot create event occurrence")
 
     @staticmethod
@@ -859,7 +592,6 @@ class EventOccurrences(models.Model):
             raise e.EntityNotFound("Cannot find specified event occurrences")
 
     def modify(self, event: md.Events = None):
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
         if event is not None:
             self.event = event
 
@@ -867,11 +599,7 @@ class EventOccurrences(models.Model):
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot save event occurrence')
-=======
             raise e.EntityAlreadyExists("Cannot save event occurrence")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 class TaskCategories(models.Model):
@@ -886,21 +614,6 @@ class TaskCategories(models.Model):
     default_acceptable_slide_time = models.DurationField()
 
     def __str__(self):
-<<<<<<< HEAD
-        return self.Name
-
-
-    @staticmethod
-    def create_task_category(
-            user: md.Users,
-            name: str,
-            default_priority_level: md.PriorityLevels,
-            default_acceptable_slide_time: timedelta,
-            description: str = None,
-            default_reminder_time: timedelta = None,
-            default_localization: str = None,
-            default_color: str = None
-=======
         return self.name
 
     @staticmethod
@@ -913,7 +626,6 @@ class TaskCategories(models.Model):
         default_reminder_time: timedelta = None,
         default_localization: str = None,
         default_color: str = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         task_category = md.TaskCategories()
         task_category.task_category_creator = user
@@ -927,13 +639,9 @@ class TaskCategories(models.Model):
             task_category.description = description
 
         if default_reminder_time is None:
-<<<<<<< HEAD
-            task_category.default_reminder_time = default_priority_level.default_reminder_time
-=======
             task_category.default_reminder_time = (
                 default_priority_level.default_reminder_time
             )
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
         else:
             task_category.default_reminder_time = default_reminder_time
 
@@ -951,18 +659,6 @@ class TaskCategories(models.Model):
             task_category.save()
             return task_category
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create task category')
-
-    @staticmethod
-    def get_task_categories(
-            task_category_id: int = None,
-            user: md.Users = None,
-            name: str = None
-    ):
-        if task_category_id is None and user is None and name is None:
-            raise e.NoDataGiven('Need to specify task category')
-=======
             raise e.EntityAlreadyExists("Cannot create task category")
 
     @staticmethod
@@ -971,7 +667,6 @@ class TaskCategories(models.Model):
     ):
         if task_category_id is None and user is None and name is None:
             raise e.NoDataGiven("Need to specify task category")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
         try:
             if task_category_id is not None:
@@ -981,22 +676,6 @@ class TaskCategories(models.Model):
             else:
                 return md.TaskCategories.objects.get(name=name)
         except ObjectDoesNotExist:
-<<<<<<< HEAD
-            raise e.EntityNotFound('Cannot find specified task category')
-
-
-    def modify(
-            self,
-            name: str = None,
-            description: str = None,
-            default_priority_level: md.PriorityLevels = None,
-            default_acceptable_slide_time: timedelta = None,
-            default_reminder_time: timedelta = None,
-            default_localization: str = None,
-            default_color: str = None
-    ):
-
-=======
             raise e.EntityNotFound("Cannot find specified task category")
 
     def modify(
@@ -1009,7 +688,6 @@ class TaskCategories(models.Model):
         default_localization: str = None,
         default_color: str = None,
     ):
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
         if name is not None:
             self.name = name
 
@@ -1035,11 +713,7 @@ class TaskCategories(models.Model):
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot save task category')
-=======
             raise e.EntityAlreadyExists("Cannot save task category")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 class Tasks(models.Model):
@@ -1058,43 +732,18 @@ class Tasks(models.Model):
     deadline = models.DateTimeField()
     acceptable_slide_time = models.DurationField()
     first_occurrence = models.DateTimeField()
-<<<<<<< HEAD
-
-    class StatusOptions(models.IntegerChoices):
-        (0, 'Not finished'),
-        (1, 'Finished')
-=======
     completion_date = models.DateTimeField()
 
     class StatusOptions(models.IntegerChoices):
         (0, "Not finished"),
         (1, "Finished"),
         (-1, "Not aplicable")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
     status = models.IntegerField(choices=StatusOptions)
 
     def __str__(self):
         return self.Name
 
-<<<<<<< HEAD
-
-    @staticmethod
-    def create_task(
-            user: md.Users,
-            task_category: md.TaskCategories,
-            priority_level: md.PriorityLevels,
-            repeat_pattern: md.RepeatPatterns,
-            name: str,
-            expected_completion_date: datetime,
-            first_occurrence: datetime,
-            description: str = None,
-            reminder_time: timedelta = None,
-            localization: str = None,
-            color: str = None,
-            deadline: datetime = None,
-            acceptable_slide_time: timedelta = None
-=======
     @staticmethod
     def create_task(
         user: md.Users,
@@ -1110,7 +759,6 @@ class Tasks(models.Model):
         color: str = None,
         deadline: datetime = None,
         acceptable_slide_time: timedelta = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         task = md.Tasks()
         task.task_creator = user
@@ -1156,22 +804,6 @@ class Tasks(models.Model):
             task.save()
             return task
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create task')
-
-
-    @staticmethod
-    def get_tasks(
-            task_id: int = None,
-            user: md.Users = None,
-            name: str = None,
-            category: md.TaskCategories = None,
-            localization: str = None,
-            expected_completion_date: datetime = None,
-            deadline: datetime = None
-    ):
-
-=======
             raise e.EntityAlreadyExists("Cannot create task")
 
     @staticmethod
@@ -1184,7 +816,6 @@ class Tasks(models.Model):
         expected_completion_date: datetime = None,
         deadline: datetime = None,
     ):
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
         try:
             all_tasks = md.Tasks.objects.all()
 
@@ -1211,25 +842,6 @@ class Tasks(models.Model):
 
             return all_tasks
         except ObjectDoesNotExist:
-<<<<<<< HEAD
-            raise e.EntityNotFound('Cannot find such task')
-
-
-    def modify(
-            self,
-            name: str = None,
-            category: md.TaskCategories = None,
-            priority_level: md.PriorityLevels = None,
-            repeat_pattern: md.RepeatPatterns = None,
-            description: str = None,
-            reminder_time: timedelta = None,
-            localization: str = None,
-            color: str = None,
-            expected_completion_date: datetime = None,
-            deadline: datetime = None,
-            acceptable_slide_time: timedelta = None,
-            status: int = None
-=======
             raise e.EntityNotFound("Cannot find such task")
 
     def modify(
@@ -1246,7 +858,6 @@ class Tasks(models.Model):
         deadline: datetime = None,
         acceptable_slide_time: timedelta = None,
         status: int = None,
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     ):
         if name is not None:
             self.name = name
@@ -1282,20 +893,14 @@ class Tasks(models.Model):
             self.acceptable_slide_time = acceptable_slide_time
 
         if status is not None:
-<<<<<<< HEAD
-=======
             if status == 1:
                 self.completion_date = datetime.now()
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
             self.status = status
 
         try:
             self.save()
             return self
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot save task')
-=======
             raise e.EntityAlreadyExists("Cannot save task")
 
     @staticmethod
@@ -1316,7 +921,6 @@ class Tasks(models.Model):
                 weeks=repeat_pattern.weeks_interval,
                 days=repeat_pattern.days_interval,
             )
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 class TaskOccurrences(models.Model):
@@ -1325,14 +929,7 @@ class TaskOccurrences(models.Model):
     start_time = models.DateTimeField()
 
     @staticmethod
-<<<<<<< HEAD
-    def create_task_occurrence(
-            task: md.Tasks,
-            start_time: datetime
-    ):
-=======
     def create_task_occurrence(task: md.Tasks, start_time: datetime):
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
         task_occurrence = md.TaskOccurrences()
         task_occurrence.task = task
         task_occurrence.start_time = start_time
@@ -1341,28 +938,6 @@ class TaskOccurrences(models.Model):
             task_occurrence.save()
             return task_occurrence
         except IntegrityError:
-<<<<<<< HEAD
-            raise e.EntityAlreadyExists('Cannot create task occurrence')
-
-
-    @staticmethod
-    def get_task_occurrences(
-            task_occurrence_id: int = None,
-            event: md.TaskOccurrences = None
-    ):
-        try:
-            all_tasks_occurrences = md.TaskOccurrences.objects.all()
-
-            if task_occurrence_id is not None:
-                all_tasks_occurrences.filter(task_occurrence_id=task_occurrence_id)
-
-            if event is not None:
-                all_tasks_occurrences.filter(event=event)
-
-            return all_tasks_occurrences
-        except ObjectDoesNotExist:
-            raise e.EntityNotFound('Cannot find such task occurrences')
-=======
             raise e.EntityAlreadyExists("Cannot create task occurrence")
 
 
@@ -1434,4 +1009,3 @@ class Notes(models.Model):
             return all_notes
         except ObjectDoesNotExist:
             raise e.EntityNotFound("Cannot find such note")
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)

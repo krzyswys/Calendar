@@ -236,10 +236,10 @@ def load_data():
     generate_repeat_patterns(n)
     generate_events(n)
     generate_task_categories(n)
-    generate_tasks(n)
+    # generate_tasks(n)
     generate_notes()
 
 
 def generate_data():
-    # load_data();
-    pass
+    load_data()
+    # pass

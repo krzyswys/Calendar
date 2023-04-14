@@ -15,14 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-<<<<<<< HEAD
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-=======
 from calendar_events.models import index
+from calendar_events.views import *
 
 urlpatterns = [
     path("", index, name="index"),
->>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
+    path("event_statistics", event_statistics, name="event_statistics"),
 ]

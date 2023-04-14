@@ -1,4 +1,4 @@
-from calendar_events.models import Events
+from calendar_events.models import Events, EventCategories
 from django.db.models import Sum, Count
 
 
@@ -7,12 +7,12 @@ def calculate_event_duration_by_category():
     categories = (
         Events.objects.order_by().values_list("EventCategory", flat=True).distinct()
     )
-
-    for category in categories:
+    event_categories = EventCategories.objects.filter(event_category_id__in=categories)
+    for category in event_categories:
         duration_sum = Events.objects.filter(EventCategory=category).aggregate(
             duration_sum=Sum("Duration")
         )["duration_sum"]
-        result[category.CategoryName] = duration_sum
+        result[category.name] = duration_sum
 
     return result
 
