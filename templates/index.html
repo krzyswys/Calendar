@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <head>
+      {%load static %}
+      <link rel="stylesheet" href="{% static 'css/indexStyles.css' %}" />
+    </head>
+    <title>Calendar Events</title>
+  </head>
+  <body>
+    <div class="user-container">
+      <h1>Calendar Events</h1>
+
+      <h2 class="users-list">Users</h2>
+      <ul class="users-list">
+        {% for user in users %}
+        <li>
+          <strong>Login:</strong> {{ user.login }}<br />
+          <strong>User ID:</strong> {{ user.user_id }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="page-container">
+      <div class="item-container">
+        <h2 class="priority-levels-list-head">Priority Levels</h2>
+        <ul class="priority-levels-list">
+          {% for priority_level in priority_levels %}
+          <div class="list-item-container">
+          <li>
+            <strong>Name:</strong> {{ priority_level.name }}<br />
+            <strong>Creator:</strong>
+
+            <p style="margin: 0px 0px 0px 10px; padding: 0px">
+              <strong>Name:</strong
+              >{{priority_level.priority_level_creator.login}}
+              <strong>Id:</strong
+              >{{priority_level.priority_level_creator.user_id}}
+            </p>
+            <strong>ID:</strong> {{ priority_level.priority_level_id }}<br />
+            <strong>Value:</strong> {{ priority_level.priority_value }}<br />
+            <strong>Markdown:</strong> {{ priority_level.markdown }}<br />
+            <strong>Default Reminder Time:</strong>
+            <time datetime="{{priority_level.default_reminder_time }}"
+              >{{priority_level.default_reminder_time }}</time
+            >
+          </li>
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="item-container">
+        <h2 class="event-categories-list-head">Event Categories</h2>
+        <ul class="event-categories-list">
+          {% for event_category in event_categories %}
+          <div class="list-item-container">
+          <li>
+            <strong>ID:</strong> {{ event_category.event_category_id }}<br />
+            <strong>Creator:</strong>
+
+            <p style="margin: 0px 0px 0px 10px; padding: 0px">
+              <strong>Name:</strong
+              >{{event_category.event_category_creator.login}}
+              <strong>Id:</strong
+              >{{event_category.event_category_creator.user_id}}
+            </p>
+            <strong>Name:</strong> {{ event_category.name }}<br />
+            <strong>Description:</strong> {{ event_category.description }}<br />
+            <strong>Default Priority Level:</strong>
+            <!-- TODO: get to know how to use functions  -->
+            {{event_category.default_priority_level }}<br />
+            <strong>Default Reminder Time:</strong>
+            <time datetime="{{event_category.default_reminder_time }}"
+              >{{event_category.default_reminder_time }}</time
+            ><br />
+            <strong>Default Localization:</strong>{{event_category.default_localization }}<br />
+            <strong>Default Duration Time:</strong>
+            <time datetime="{{event_category.default_duration_time }}"
+              >{{event_category.default_duration_time }}</time
+            ><br />
+            <strong>Default Color:</strong> {{ event_category.default_color }}
+          </li>
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="repeat-patterns-list-head">Repeat Patterns</h2>
+        <ul class="repeat-patterns-list">
+          {% for repeat_pattern in repeat_patterns %}
+          <div class="list-item-container">
+          <li>
+            <strong>ID:</strong> {{ repeat_pattern.repeat_pattern_id }}<br />
+            <strong>Creator:</strong> <br />
+            <p style="margin: 0px 0px 0px 10px; padding: 0px">
+              <strong>Name:</strong
+              >{{repeat_pattern.repeat_pattern_creator.login}}
+              <strong>Id:</strong
+              >{{repeat_pattern.repeat_pattern_creator.user_id}}
+            </p>
+            <strong>Name:</strong> {{ repeat_pattern.name }}<br />
+            <strong>Days Interval:</strong> {{repeat_pattern.days_interval }}<br />
+            <strong>Weeks Interval:</strong> {{ repeat_pattern.weeks_interval}}<br />
+            <strong>Months Interval:</strong> {{ repeat_pattern.months_interval}}<br />
+            <strong>Years Interval:</strong> {{ repeat_pattern.years_interval}}<br />
+            <strong>Number of Repetitions:</strong> {{repeat_pattern.number_of_repetitions }}
+          </li>
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="item-container">
+        <h2 class="events-list-head">Events</h2>
+        <ul class="events-list">
+          {% for event in events %}
+          <div class="list-item-container">
+          <li>
+            <strong>Event ID: </strong
+            >{{ event.EventID }}<br />
+            <strong>Creator: </strong
+            ><br />
+            <p style="margin: 0px 0px 0px 10px; padding: 0px">
+              <strong>Name:</strong
+              >{{event.Creator.login}}
+              <strong>Id:</strong
+              >{{event.Creator.user_id}}
+            </p>
+            <strong>Event Category: </strong
+            >{{ event.EventCategory }}<br />
+            <strong>Priority Level: </strong
+            >{{ event.PriorityLevel }}<br /g>
+            <strong>Repeat Pattern: </strong
+            >{{ event.RepeatPattern }}<br /g>
+            <strong>Name: </strong
+            >{{ event.Name }}<br />
+            <strong>Description: </strong
+            >{{ event.Description }}<br />
+            <strong>Reminder Time:</strong>
+            {{ event.ReminderTime }}<br />
+            <strong>Localization: </strong
+            >{{ event.Localization }}<br />
+            <strong>Duration: </strong
+            >{{ event.Duration }}<br />
+            <strong>Creation Date:</strong>
+            {{ event.CreationDate }}<br />
+            <strong>Color: </strong
+            >{{ event.Color }}<br />
+            <br />
+          </li>
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="item-container">
+        <h2 class="task-categories-list-head">Task categories</h2>
+        <ul class="task-categories-list">
+            
+          {% for task_category in task_categories %}
+          <div class="list-item-container">
+            <strong>Task Category ID: </strong
+            >{{ task_category.task_category_id }}<br />
+            <strong>Task Category Creator: </strong>
+            <p style="margin: 0px 0px 0px 10px; padding: 0px">
+              <strong>Name:</strong
+              >{{task_category.task_category_creator.login}}
+              <strong>Id:</strong
+              >{{task_category.task_category_creator.user_id}}
+            </p>
+            <strong>Name: </strong
+            >{{ task_category.name }}<br />
+            <strong>Description: </strong
+            >{{ task_category.description }}<br />
+            <strong> Default Priority Level: </strong
+            >{{ task_category.default_priority_level }}
+            <br />
+            <strong>Default Reminder Time: </strong
+            >{{ task_category.default_reminder_time }}<br />
+            <strong>Default Localization: </strong
+            >{{ task_category.default_localization }}<br />
+            <strong>Default Color: </strong
+            >{{ task_category.default_color }}<br />
+            <strong> Default Acceptable Slide Time: </strong
+            >{{ task_category.default_acceptable_slide_time }}
+            <br />
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="item-container">
+        <h2 class="tasks-list-head">Tasks</h2>
+        <ul class="tasks-list">
+          {% for task in tasks %}
+          <div class="list-item-container">
+          <strong>Task ID: </strong
+          >{{ task.task_id }}<br />
+          <strong>Task Creator: </strong>
+          <p style="margin: 0px 0px 0px 10px; padding: 0px">
+            <strong>Name:</strong
+            >{{task.task_creator.login}}
+            <strong>Id:</strong
+            >{{task.task_creator.user_id}}
+          </p>
+          <strong>Task Category: </strong
+          >{{ task.task_category }}<br />
+          <strong>Priority Level: </strong
+          >{{ task.priority_level }}<br />
+          <strong>Repeat Pattern: </strong
+          >{{ task.repeat_pattern }}<br /g>
+          <strong>Name: </strong
+          >{{ task.name }}<br />
+          <strong>Description: </strong
+          >{{ task.description }}<br />
+          <strong>Reminder Time: </strong
+          >{{ task.reminder_time }}<br />
+          <strong>Localization: </strong
+          >{{ task.localization }}<br />
+          <strong>Creation Date: </strong
+          >{{ task.creation_date }}<br />
+          <strong>Color: </strong
+          >{{ task.color }}<br />
+          <strong>Expected Completion Date: </strong
+          >{{ task.expected_completion_date }}<br />
+          <strong>Deadline: </strong
+          >{{ task.deadline }}<br />
+          <strong>Acceptable Slide Time: </strong
+          >{{ task.acceptable_slide_time }}<br />
+          <strong>First Occurrence: </strong
+          >{{ task.first_occurrence }}<br />
+          <br />
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="item-container">
+        <h2 class="notes-list-head">Notes</h2>
+        <ul class="notes-list">
+          {% for note in notes %}
+          <div class="list-item-container">
+          <li>
+            <strong>Title:</strong> {{ priority_level.Title }}<br />
+            <strong>Creator:</strong>
+
+            <p style="margin: 0px 0px 0px 10px; padding: 0px">
+              <strong>Name:</strong
+              >{{note.Creator.login}}
+              <strong>Id:</strong
+              >{{note.Creator.user_id}}
+            </p>
+            <strong>ID:</strong> {{ note.NoteID }}<br />
+            <strong>Content:</strong> {{ note.Contents }}<br />
+            <strong>DateOfCreation:</strong> {{ note.DateOfCreation }}<br />
+            <strong>PriorityLevel</strong>{{note.PriorityLevel}}
+          </li>
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="item-container">
+        <h2 class="event-occurences-list-head">Event Occurrences</h2>
+        <ul class="event-occurences-list">
+          {% for occurrence in event_occurences %}
+          <div class="list-item-container">
+            <li>
+              <strong>Event Name:</strong> {{ occurrence.event.Name }}<br />
+              <strong>Start Time:</strong> {{ occurrence.start_time }}<br />
+              <strong>Creator:</strong>
+              <p style="margin: 0px 0px 0px 10px; padding: 0px">
+                <strong>Name:</strong> {{ occurrence.event.Creator.login }}<br />
+                <strong>ID:</strong> {{ occurrence.event.Creator.user_id }}
+              </p>
+              <strong>Event ID:</strong> {{ occurrence.event.EventID }}<br />
+              <strong>Event Category:</strong> {{ occurrence.event.EventCategory.Name }}<br />
+              <strong>Priority Level:</strong> {{ occurrence.event.PriorityLevel.Name }}<br />
+              <strong>Repeat Pattern:</strong> {{ occurrence.event.RepeatPattern.Name }}<br />
+              <strong>Description:</strong> {{ occurrence.event.Description }}<br />
+              <strong>Reminder Time:</strong> {{ occurrence.event.ReminderTime }}<br />
+              <strong>Localization:</strong> {{ occurrence.event.Localization }}<br />
+              <strong>Duration:</strong> {{ occurrence.event.Duration }}<br />
+              <strong>Creation Date:</strong> {{ occurrence.event.CreationDate }}<br />
+              <strong>Color:</strong> {{ occurrence.event.Color }}<br />
+              <strong>First Occurrence:</strong> {{ occurrence.event.FirstOccurence }}<br />
+            </li>
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+
+
+      <div class="item-container">
+        <h2 class="tasks-occurences-list-head">Tasks occurences</h2>
+        <ul class="tasks-occurences-list">
+            {% for task_occurrence in tasks_occurences %}
+            <div class="list-item-container">
+                <li>
+                    <strong>Name:</strong> {{ task_occurrence.task.name }}<br>
+                    <strong>Description:</strong> {{ task_occurrence.task.description }}<br>
+                    <strong>Creator:</strong> {{ task_occurrence.task.task_creator.login }}<br>
+                    <strong>Category:</strong> {{ task_occurrence.task.task_category.name }}<br>
+                    <strong>Priority Level:</strong> {{ task_occurrence.task.priority_level.name }}<br>
+                    <strong>Repeat Pattern:</strong> {{ task_occurrence.task.repeat_pattern.name }}<br>
+                    <strong>Localization:</strong> {{ task_occurrence.task.localization }}<br>
+                    <strong>Reminder Time:</strong> {{ task_occurrence.task.reminder_time }}<br>
+                    <strong>Expected Completion Date:</strong> {{ task_occurrence.task.expected_completion_date }}<br>
+                    <strong>Deadline:</strong> {{ task_occurrence.task.deadline }}<br>
+                    <strong>Acceptable Slide Time:</strong> {{ task_occurrence.task.acceptable_slide_time }}<br>
+                    <strong>First Occurrence:</strong> {{ task_occurrence.task.first_occurrence }}<br>
+                    <strong>Start Time:</strong> {{ task_occurrence.start_time }}<br>
+                </li>
+            </div>
+            {% endfor %}
+        </ul>
+    </div>
+    
+
+    </div>
+  </body>
+</html>

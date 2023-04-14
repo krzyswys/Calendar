@@ -20,7 +20,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD
 SECRET_KEY = '!h4gn#-d1!zd80$!1sepfrvsyl2aq^%m^za!7x)69&jvo_$f_#'
+=======
+SECRET_KEY = "!h4gn#-d1!zd80$!1sepfrvsyl2aq^%m^za!7x)69&jvo_$f_#"
+>>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+<<<<<<< HEAD
     'calendar_events',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -63,21 +68,67 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+=======
+    "calendar_events",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "faker",
+    "django_extensions",
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+ROOT_URLCONF = "python_calendar.urls"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": ["templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+>>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
             ],
         },
     },
 ]
 
+<<<<<<< HEAD
 WSGI_APPLICATION = 'python_calendar.wsgi.application'
+=======
+WSGI_APPLICATION = "python_calendar.wsgi.application"
+>>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+<<<<<<< HEAD
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+=======
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+>>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     }
 }
 
@@ -87,6 +138,7 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
+<<<<<<< HEAD
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
@@ -97,6 +149,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+=======
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+>>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
     },
 ]
 
@@ -104,9 +168,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
+<<<<<<< HEAD
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+=======
+LANGUAGE_CODE = "en-us"
+
+TIME_ZONE = "UTC"
+>>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)
 
 USE_I18N = True
 
@@ -118,4 +188,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+<<<<<<< HEAD
 STATIC_URL = '/static/'
+=======
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+>>>>>>> 849d243 (added statictic functions for events and tasks, html view for individual tables, functions applying patterns, fake data generator on server run file)

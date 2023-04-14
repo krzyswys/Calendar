@@ -1,0 +1,260 @@
+p {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 30px;
+}
+
+h2 {
+    font-size: 24px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+strong {
+    font-weight: bold;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100vw;
+    height: auto;
+    justify-content: center;
+    align-items: start;
+}
+
+.item-container {
+    width: 260px;
+    height: fit-content;
+}
+
+.user-container {
+    width: 100vw;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+/* Style for Users list */
+.users-list {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #f39c9c;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Style for Priority Levels list */
+.priority-levels-list,
+.priority-levels-list-head {
+    padding: 20px 5px 20px 5px;
+}
+
+.priority-levels-list-head {
+    background-color: rgb(192, 245, 156);
+    border-radius: 3px;
+    text-align: center;
+}
+
+.priority-levels-list>.list-item-container {
+    background-color: rgb(192, 243, 172);
+    margin: 10px 0px 10px 0px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+}
+
+.priority-levels-list>.list-item-container:hover {
+    background-color: rgb(175, 244, 148);
+    scale: 101%;
+    cursor: pointer;
+}
+
+/* Style for Event Categories list */
+
+.event-categories-list,
+.event-categories-list-head {
+    padding: 20px 5px 20px 5px;
+}
+
+.event-categories-list-head {
+    background-color: rgb(156, 245, 226);
+    border-radius: 3px;
+    text-align: center;
+}
+
+.event-categories-list>.list-item-container {
+    background-color: rgb(162, 240, 224);
+    margin: 10px 0px 10px 0px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+}
+
+.event-categories-list>.list-item-container:hover {
+    background-color: rgb(134, 246, 223);
+    scale: 101%;
+    cursor: pointer;
+}
+
+/* Style for Repeat Patterns list */
+.repeat-patterns-list,
+.repeat-patterns-list-head {
+    padding: 20px 5px 20px 8px;
+}
+
+.repeat-patterns-list-head {
+    background-color: rgb(204, 156, 245);
+    border-radius: 3px;
+    text-align: center;
+}
+
+.repeat-patterns-list>.list-item-container {
+    background-color: rgb(210, 171, 244);
+    margin: 10px 0px 10px 0px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+}
+
+.repeat-patterns-list>.list-item-container:hover {
+    background-color: rgb(196, 133, 251);
+    scale: 101%;
+    cursor: pointer;
+}
+
+/* Style for Events list */
+.events-list,
+.events-list-head {
+    padding: 20px 5px 20px 5px;
+}
+
+.events-list-head {
+    background-color: rgb(156, 171, 245);
+    border-radius: 3px;
+    text-align: center;
+}
+
+.events-list>.list-item-container {
+    background-color: rgb(162, 171, 240);
+    margin: 10px 0px 10px 0px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+}
+
+.events-list>.list-item-container:hover {
+    background-color: rgb(134, 171, 223);
+    scale: 101%;
+    cursor: pointer;
+}
+
+/* Style for Task Categories list */
+.task-categories-list,
+.task-categories-list-head {
+    padding: 20px 5px 20px 5px;
+}
+
+.task-categories-list-head {
+    background-color: rgb(245, 227, 156);
+    border-radius: 3px;
+    text-align: center;
+}
+
+.task-categories-list>.list-item-container {
+    background-color: rgb(243, 229, 172);
+    margin: 10px 0px 10px 0px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+}
+
+.task-categories-list>.list-item-container:hover {
+    background-color: rgb(242, 219, 128);
+    scale: 101%;
+    cursor: pointer;
+}
+
+/* Style for Tasks list */
+.tasks-list,
+.tasks-list-head {
+    padding: 20px 5px 20px 5px;
+}
+
+.tasks-list-head {
+    background-color: rgb(245, 156, 207);
+    text-align: center;
+    border-radius: 3px;
+}
+
+.tasks-list>.list-item-container {
+    background-color: rgb(248, 170, 214);
+    margin: 10px 0px 10px 0px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+}
+
+.tasks-list>.list-item-container:hover {
+    background-color: rgb(249, 125, 196);
+    scale: 101%;
+    cursor: pointer;
+}
+
+/*Style for notes list*/
+.notes-list,
+.notes-list-head {
+    padding: 20px 5px 20px 5px;
+}
+
+.notes-list-head {
+    background-color: rgb(245, 244, 156);
+    text-align: center;
+    border-radius: 3px;
+}
+
+.notes-list>.list-item-container {
+    background-color: rgb(248, 246, 172);
+    margin: 10px 0px 10px 0px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: 0.2s;
+}
+
+.notes-list>.list-item-container:hover {
+    background-color: rgb(246, 245, 137);
+    scale: 101%;
+    cursor: pointer;
+}

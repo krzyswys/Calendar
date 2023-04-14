@@ -1,0 +1,22 @@
+- efficency wzgledem prioryty level dla każdego zadania
+- efficency bez prioryty level dla każdego zadania
+- ile zadan zrobionych na czas deadline z danym priorytetem
+- ile zadan zrobionych na podczas slidetime z danym priorytetem
+
+- ile ogolem zadan zrobionych na czas deadlien
+- ill ogólem zadan zrobionych na czas slidetime
+- ile zadan zrobionych do expected_completion
+
+- sprawdzić ile % zadań danej kategorii jest robionych na jaki czas (do teraz/wszystko) (dealine, slide, expected_completion)
+
+- średnia obsuwa dla zadań w danej kategorii wzgledem różnych czasów(dealine, slide, expected_completion)
+
+- średnia obsuwa dla zadań w danym priorytecie wzgledem różnych czasów(dealine, slide, expected_completion)
+
+- ile czasu zajmują zadania z danej kategorii
+- ile czasu zajmują zadania z danym priorytetem
+
+
+- ile czasu sumarycznie zajmują eventy danej kategorii
+- % eventow  w danej lokalizacji
+- % eventow o danym priority level
