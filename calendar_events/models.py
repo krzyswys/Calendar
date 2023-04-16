@@ -21,6 +21,8 @@ from django.shortcuts import render
 
 # FIXME: trzba doprecyzować jak repeatpattern.intervals działa, narazie zakładam że: powtarzanie co x dni + co x tygodni + co x miesiecy...
 # liczby się zamykają do kolejnego etapu: powtarzanie dzienne:max 7 dni, tygodniowe: max 4
+# Wydaje mi sie, ze nie musi tak byc. Moge ustawic powtarzanie np. co 100 dni i nie musze wtedy liczyc ile to jest miesiecy / tygodni / dni
+
 # number of repetitions chyba powinno być różne dla każdego pola?
 
 
@@ -386,22 +388,22 @@ class RepeatPatterns(models.Model):
 
 
 class Events(models.Model):
-    EventID = models.BigAutoField(primary_key=True)
-    Creator = models.ForeignKey(Users, on_delete=models.CASCADE)
-    EventCategory = models.ForeignKey(EventCategories, on_delete=models.CASCADE)
-    PriorityLevel = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
-    RepeatPattern = models.ForeignKey(RepeatPatterns, on_delete=models.CASCADE)
-    Name = models.CharField(max_length=60)
-    Description = models.CharField(max_length=500)
-    ReminderTime = models.DurationField()
-    Localization = models.CharField(max_length=60)
-    Duration = models.DurationField()
-    CreationDate = models.DateTimeField(default=datetime.now)
-    Color = models.CharField(max_length=3)
-    FirstOccurence = models.DateTimeField(default=datetime.now)
+    event_id = models.BigAutoField(primary_key=True)
+    event_creator = models.ForeignKey(Users, on_delete=models.CASCADE)
+    event_category = models.ForeignKey(EventCategories, on_delete=models.CASCADE)
+    priority_level = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
+    repeat_pattern = models.ForeignKey(RepeatPatterns, on_delete=models.CASCADE)
+    name = models.CharField(max_length=60)
+    description = models.CharField(max_length=500)
+    reminder_time = models.DurationField()
+    localization = models.CharField(max_length=60)
+    duration = models.DurationField()
+    creation_date = models.DateTimeField(default=datetime.now)
+    color = models.CharField(max_length=3)
+    first_occurrence = models.DateTimeField(default=datetime.now)
 
     def __str__(self):
-        return self.Name
+        return self.name
 
     @staticmethod
     def create_event(
@@ -418,12 +420,12 @@ class Events(models.Model):
         color: str = None,
     ):
         event = md.Events()
-        event.Creator = user
-        event.EventCategory = event_category
-        event.RepeatPattern = repeat_pattern
-        event.Name = name
-        event.FirstOccurence = first_occurrence
-        event.PriorityLevel = priority_level
+        event.event_creator = user
+        event.event_category = event_category
+        event.repeat_pattern = repeat_pattern
+        event.name = name
+        event.first_occurrence = first_occurrence
+        event.priority_level = priority_level
 
         if description is None:
             event.description = ""
@@ -431,9 +433,9 @@ class Events(models.Model):
             event.description = description
 
         if duration is None:
-            event.Duration = event_category.default_duration_time
+            event.duration = event_category.default_duration_time
         else:
-            event.Duration = duration
+            event.duration = duration
 
         if priority_level is None:
             event.priority_level = event_category.default_priority_level
@@ -441,14 +443,14 @@ class Events(models.Model):
             event.priority_level = priority_level
 
         if reminder_time is None:
-            event.ReminderTime = event_category.default_reminder_time
+            event.reminder_time = event_category.default_reminder_time
         else:
-            event.ReminderTime = reminder_time
+            event.reminder_time = reminder_time
 
         if localization is None:
-            event.Localization = event_category.default_localization
+            event.localization = event_category.default_localization
         else:
-            event.Localization = localization
+            event.localization = localization
 
         if color is None:
             event.color = event_category.default_color
@@ -478,9 +480,9 @@ class Events(models.Model):
 
         try:
             if event_id is not None:
-                return md.Events.objects.get(EventID=event_id)
+                return md.Events.objects.get(event_id=event_id)
             elif event_name is not None:
-                return md.Events.objects.get(Name=event_name)
+                return md.Events.objects.get(name=event_name)
             else:
                 all_rows = md.Events.objects.all()
 
@@ -541,10 +543,9 @@ class Events(models.Model):
 
     @staticmethod
     def apply_event_pattern_for(event):
-        event = Events.objects.get(EventID=event.EventID)
-        repeat_pattern = event.RepeatPattern
+        repeat_pattern = event.repeat_pattern
 
-        start_date = event.FirstOccurence
+        start_date = event.first_occurrence
 
         for i in range(repeat_pattern.number_of_repetitions):
             occurrence = EventOccurrences.create_event_occurrence(
@@ -577,17 +578,25 @@ class EventOccurrences(models.Model):
             raise e.EntityAlreadyExists("Cannot create event occurrence")
 
     @staticmethod
-    def get_event_occurrences(id_event_occurrence: int = None, event: md.Events = None):
-        if event is None and id_event_occurrence is None:
+    def get_event_occurrences(id_event_occurrence: int = None, event: md.Events = None, time_start = None, time_stop = None):
+        if event is None and id_event_occurrence is None and time_start is None and time_stop is None:
             raise e.NoDataGiven("Need to specify event occurrence")
 
         try:
+            all_occurrences = md.EventOccurrences.objects.all()
             if id_event_occurrence is not None:
-                return md.EventOccurrences.objects.get(
-                    event_occurrence_id=id_event_occurrence
-                )
-            else:
-                return md.EventOccurrences.objects.get(event=event)
+                all_occurrences.filter(event_occurrence_id=id_event_occurrence)
+
+            if event is not None:
+                all_occurrences.filter(event=event)
+
+            if time_start is not None:
+                all_occurrences.filter(start_time__gte=time_start)
+
+            if time_stop is not None:
+                all_occurrences.filter(start_time__lte=time_stop)
+
+            return all_occurrences
         except ObjectDoesNotExist:
             raise e.EntityNotFound("Cannot find specified event occurrences")
 
@@ -734,13 +743,6 @@ class Tasks(models.Model):
     first_occurrence = models.DateTimeField()
     completion_date = models.DateTimeField()
 
-    class StatusOptions(models.IntegerChoices):
-        (0, "Not finished"),
-        (1, "Finished"),
-        (-1, "Not aplicable")
-
-    status = models.IntegerField(choices=StatusOptions)
-
     def __str__(self):
         return self.Name
 
@@ -856,8 +858,7 @@ class Tasks(models.Model):
         color: str = None,
         expected_completion_date: datetime = None,
         deadline: datetime = None,
-        acceptable_slide_time: timedelta = None,
-        status: int = None,
+        acceptable_slide_time: timedelta = None
     ):
         if name is not None:
             self.name = name
@@ -892,11 +893,6 @@ class Tasks(models.Model):
         if acceptable_slide_time is not None:
             self.acceptable_slide_time = acceptable_slide_time
 
-        if status is not None:
-            if status == 1:
-                self.completion_date = datetime.now()
-            self.status = status
-
         try:
             self.save()
             return self
@@ -905,7 +901,6 @@ class Tasks(models.Model):
 
     @staticmethod
     def apply_task_pattern_for(task):
-        task = Tasks.objects.get(task_id=task.task_id)
         repeat_pattern = task.repeat_pattern
 
         start_date = task.first_occurrence
@@ -928,6 +923,13 @@ class TaskOccurrences(models.Model):
     task = models.ForeignKey(Tasks, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
 
+    class StatusOptions(models.IntegerChoices):
+        (0, "Not finished"),
+        (1, "Finished"),
+        (-1, "Not aplicable")
+
+    status = models.IntegerField(choices=StatusOptions)
+
     @staticmethod
     def create_task_occurrence(task: md.Tasks, start_time: datetime):
         task_occurrence = md.TaskOccurrences()
@@ -941,27 +943,65 @@ class TaskOccurrences(models.Model):
             raise e.EntityAlreadyExists("Cannot create task occurrence")
 
 
-class Notes(models.Model):
-    NoteID = models.BigAutoField(primary_key=True)
-    Creator = models.ForeignKey(Users, on_delete=models.CASCADE)
-    Title = models.CharField(max_length=4000)
+    @staticmethod
+    def get_task_occurrences(task_occurrence_id: int,
+                             task: md.Tasks,
+                             time_start: datetime,
+                             time_stop: datetime):
+        try:
+            all_occurrences = md.TaskOccurrences.objects.all()
 
-    Contents = models.CharField(max_length=4000)
-    DateOfCreation = models.DateTimeField(default=datetime.now)
-    ModificationDate = models.DateTimeField(default=datetime.now)
-    PriorityLevel = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
+            if task_occurrence_id is not None:
+                all_occurrences.filter(task_occurrence_id=task_occurrence_id)
+
+            if task is not None:
+                all_occurrences.filter(task=task)
+
+            if time_start is not None:
+                all_occurrences.filter(start_time__gte=time_start)
+
+            if time_stop is not None:
+                all_occurrences.filter(start_time__lte=time_stop)
+
+            return all_occurrences
+
+        except ObjectDoesNotExist:
+            raise e.EntityNotFound("Cannot find such task occurrence")
+
+
+    def modify(self, task: md.Tasks = None):
+        if task is not None:
+            self.task = task
+
+        try:
+            self.save()
+            return self
+        except IntegrityError:
+            raise e.EntityAlreadyExists("Cannot save task occurrence")
+
+
+class Notes(models.Model):
+    note_id = models.BigAutoField(primary_key=True)
+    note_creator = models.ForeignKey(Users, on_delete=models.CASCADE)
+    title = models.CharField(max_length=4000)
+    content = models.CharField(max_length=4000)
+    creation_date = models.DateTimeField(default=datetime.now)
+    modification_date = models.DateTimeField(default=datetime.now)
+    priority_level = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
 
     @staticmethod
-    def create_note(creator, Title, contents=None, prioriy_level=None):
+    def create_note(creator, title, content=None, priority_level=None):
         note = md.Notes()
-        note.Creator = creator
-        note.Title = Title
-        if contents is not None:
-            note.Contents = contents
+        note.note_creator = creator
+        note.title = title
+
+        if content is not None:
+            note.content = content
         else:
             note.Contents = ""
-        if prioriy_level is not None:
-            note.PriorityLevel = prioriy_level
+
+        if priority_level is not None:
+            note.priority_level = priority_level
         else:
             note.PriorityLevel = PriorityLevels.get_priority_levels(value=1)
 
@@ -971,13 +1011,16 @@ class Notes(models.Model):
         except IntegrityError:
             raise e.EntityAlreadyExists("Cannot create note")
 
-    @staticmethod
+
     def modify(self, content=None, priority_level=None):
-        self.ModificationDate = datetime.now()
+        self.modification_date = datetime.now()
+
         if content is not None:
-            self.Contents = content
+            self.content = content
+
         if priority_level is not None:
-            self.PriorityLevel = priority_level
+            self.priority_level = priority_level
+
         try:
             self.save()
             return self
@@ -986,25 +1029,33 @@ class Notes(models.Model):
 
     @staticmethod
     def get_notes(
-        noteid=None,
+        note_id=None,
         creator=None,
-        dateofcreation=None,
-        dateOfModification=None,
-        priorityLevel=None,
-        title=None,
+        date_of_creation=None,
+        date_of_modification=None,
+        priority_level=None,
+        title=None
     ):
         try:
             all_notes = md.Notes.objects.all()
-            if noteid is not None:
-                all_notes.filter(NoteID=noteid)
+
+            if note_id is not None:
+                all_notes.filter(note_id=note_id)
+
             if creator is not None:
-                all_notes.filter(Creator=creator)
-            if dateofcreation is not None:
-                all_notes.filter(DateOfCreation=dateofcreation)
-            if priorityLevel is not None:
-                all_notes.filter(PriorityLevel=priorityLevel)
-            if dateOfModification is not None:
-                all_notes.filter(ModificationDate=dateOfModification)
+                all_notes.filter(note_creator=creator)
+
+            if title is not None:
+                all_notes.filter(title=title)
+
+            if date_of_creation is not None:
+                all_notes.filter(creation_date=date_of_creation)
+
+            if priority_level is not None:
+                all_notes.filter(priority_level=priority_level)
+
+            if date_of_modification is not None:
+                all_notes.filter(modification_date=date_of_modification)
 
             return all_notes
         except ObjectDoesNotExist:
