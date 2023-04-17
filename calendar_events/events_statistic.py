@@ -5,12 +5,12 @@ from django.db.models import Sum, Count
 def calculate_event_duration_by_category():
     result = {}
     categories = (
-        Events.objects.order_by().values_list("EventCategory", flat=True).distinct()
+        Events.objects.order_by().values_list("event_category", flat=True).distinct()
     )
     event_categories = EventCategories.objects.filter(event_category_id__in=categories)
     for category in event_categories:
-        duration_sum = Events.objects.filter(EventCategory=category).aggregate(
-            duration_sum=Sum("Duration")
+        duration_sum = Events.objects.filter(event_category=category).aggregate(
+            duration_sum=Sum("duration")
         )["duration_sum"]
         result[category.name] = duration_sum
 

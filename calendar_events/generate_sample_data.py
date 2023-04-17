@@ -213,9 +213,9 @@ def generate_notes(n=5):
         title = fake.paragraph(nb_sentences=1)
         note = Notes.create_note(
             creator=Users.get_user(login="some_user"),
-            Title=title,
-            contents=content,
-            prioriy_level=pr,
+            title=title,
+            content=content,
+            priority_level=pr,
         )
         # note.save()
 
@@ -236,8 +236,8 @@ def load_data():
     generate_repeat_patterns(n)
     generate_events(n)
     generate_task_categories(n)
-    # generate_tasks(n)
-    generate_notes()
+    generate_tasks(n)
+    generate_notes(n)
 
 
 def generate_data():

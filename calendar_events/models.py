@@ -578,8 +578,18 @@ class EventOccurrences(models.Model):
             raise e.EntityAlreadyExists("Cannot create event occurrence")
 
     @staticmethod
-    def get_event_occurrences(id_event_occurrence: int = None, event: md.Events = None, time_start = None, time_stop = None):
-        if event is None and id_event_occurrence is None and time_start is None and time_stop is None:
+    def get_event_occurrences(
+        id_event_occurrence: int = None,
+        event: md.Events = None,
+        time_start=None,
+        time_stop=None,
+    ):
+        if (
+            event is None
+            and id_event_occurrence is None
+            and time_start is None
+            and time_stop is None
+        ):
             raise e.NoDataGiven("Need to specify event occurrence")
 
         try:
@@ -741,7 +751,14 @@ class Tasks(models.Model):
     deadline = models.DateTimeField()
     acceptable_slide_time = models.DurationField()
     first_occurrence = models.DateTimeField()
-    completion_date = models.DateTimeField()
+    completion_date = models.DateTimeField(null=True)
+
+    class StatusOptions(models.IntegerChoices):
+        (0, "Not finished"),
+        (1, "Finished"),
+        (-1, "Not aplicable")
+
+    status = models.IntegerField(choices=StatusOptions)
 
     def __str__(self):
         return self.Name
@@ -858,7 +875,7 @@ class Tasks(models.Model):
         color: str = None,
         expected_completion_date: datetime = None,
         deadline: datetime = None,
-        acceptable_slide_time: timedelta = None
+        acceptable_slide_time: timedelta = None,
     ):
         if name is not None:
             self.name = name
@@ -923,13 +940,6 @@ class TaskOccurrences(models.Model):
     task = models.ForeignKey(Tasks, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
 
-    class StatusOptions(models.IntegerChoices):
-        (0, "Not finished"),
-        (1, "Finished"),
-        (-1, "Not aplicable")
-
-    status = models.IntegerField(choices=StatusOptions)
-
     @staticmethod
     def create_task_occurrence(task: md.Tasks, start_time: datetime):
         task_occurrence = md.TaskOccurrences()
@@ -942,12 +952,13 @@ class TaskOccurrences(models.Model):
         except IntegrityError:
             raise e.EntityAlreadyExists("Cannot create task occurrence")
 
-
     @staticmethod
-    def get_task_occurrences(task_occurrence_id: int,
-                             task: md.Tasks,
-                             time_start: datetime,
-                             time_stop: datetime):
+    def get_task_occurrences(
+        task_occurrence_id: int,
+        task: md.Tasks,
+        time_start: datetime,
+        time_stop: datetime,
+    ):
         try:
             all_occurrences = md.TaskOccurrences.objects.all()
 
@@ -968,7 +979,6 @@ class TaskOccurrences(models.Model):
         except ObjectDoesNotExist:
             raise e.EntityNotFound("Cannot find such task occurrence")
 
-
     def modify(self, task: md.Tasks = None):
         if task is not None:
             self.task = task
@@ -987,10 +997,12 @@ class Notes(models.Model):
     content = models.CharField(max_length=4000)
     creation_date = models.DateTimeField(default=datetime.now)
     modification_date = models.DateTimeField(default=datetime.now)
-    priority_level = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
+    priority_level = models.ForeignKey(
+        PriorityLevels, on_delete=models.CASCADE, null=True
+    )
 
     @staticmethod
-    def create_note(creator, title, content=None, priority_level=None):
+    def create_note(creator: md.Users, title, content=None, priority_level=None):
         note = md.Notes()
         note.note_creator = creator
         note.title = title
@@ -1010,7 +1022,6 @@ class Notes(models.Model):
             return note
         except IntegrityError:
             raise e.EntityAlreadyExists("Cannot create note")
-
 
     def modify(self, content=None, priority_level=None):
         self.modification_date = datetime.now()
@@ -1034,7 +1045,7 @@ class Notes(models.Model):
         date_of_creation=None,
         date_of_modification=None,
         priority_level=None,
-        title=None
+        title=None,
     ):
         try:
             all_notes = md.Notes.objects.all()
