@@ -127,35 +127,35 @@
           <div class="list-item-container">
           <li>
             <strong>Event ID: </strong
-            >{{ event.EventID }}<br />
+            >{{ event.event_id }}<br />
             <strong>Creator: </strong
             ><br />
             <p style="margin: 0px 0px 0px 10px; padding: 0px">
               <strong>Name:</strong
-              >{{event.Creator.login}}
+              >{{event.event_creator.login}}
               <strong>Id:</strong
-              >{{event.Creator.user_id}}
+              >{{event.event_reator.user_id}}
             </p>
             <strong>Event Category: </strong
-            >{{ event.EventCategory }}<br />
+            >{{ event.event_category }}<br />
             <strong>Priority Level: </strong
-            >{{ event.PriorityLevel }}<br /g>
+            >{{ event.priority_level }}<br /g>
             <strong>Repeat Pattern: </strong
-            >{{ event.RepeatPattern }}<br /g>
+            >{{ event.repeat_pattern }}<br /g>
             <strong>Name: </strong
-            >{{ event.Name }}<br />
+            >{{ event.name }}<br />
             <strong>Description: </strong
-            >{{ event.Description }}<br />
+            >{{ event.description }}<br />
             <strong>Reminder Time:</strong>
-            {{ event.ReminderTime }}<br />
+            {{ event.reminder_time }}<br />
             <strong>Localization: </strong
-            >{{ event.Localization }}<br />
+            >{{ event.localization }}<br />
             <strong>Duration: </strong
-            >{{ event.Duration }}<br />
+            >{{ event.duration }}<br />
             <strong>Creation Date:</strong>
-            {{ event.CreationDate }}<br />
+            {{ event.creation_date }}<br />
             <strong>Color: </strong
-            >{{ event.Color }}<br />
+            >{{ event.color }}<br />
             <br />
           </li>
           </div>
@@ -250,19 +250,19 @@
           {% for note in notes %}
           <div class="list-item-container">
           <li>
-            <strong>Title:</strong> {{ priority_level.Title }}<br />
+            <strong>Title:</strong> {{ note.title }}<br />
             <strong>Creator:</strong>
 
             <p style="margin: 0px 0px 0px 10px; padding: 0px">
               <strong>Name:</strong
-              >{{note.Creator.login}}
+              >{{note.note_creator.login}}
               <strong>Id:</strong
-              >{{note.Creator.user_id}}
+              >{{note.note_creator.user_id}}
             </p>
-            <strong>ID:</strong> {{ note.NoteID }}<br />
-            <strong>Content:</strong> {{ note.Contents }}<br />
-            <strong>DateOfCreation:</strong> {{ note.DateOfCreation }}<br />
-            <strong>PriorityLevel</strong>{{note.PriorityLevel}}
+            <strong>ID:</strong> {{ note.note_id }}<br />
+            <strong>Content:</strong> {{ note.content }}<br />
+            <strong>DateOfCreation:</strong> {{ note.creation_date }}<br />
+            <strong>PriorityLevel</strong>{{note.priority_level}}
           </li>
           </div>
           {% endfor %}
@@ -275,7 +275,7 @@
           {% for occurrence in event_occurences %}
           <div class="list-item-container">
             <li>
-              <strong>Event Name:</strong> {{ occurrence.event.Name }}<br />
+              <strong>Event Name:</strong> {{ occurrence.event.name }}<br />
               <strong>Start Time:</strong> {{ occurrence.start_time }}<br />
               <strong>Creator:</strong>
               <p style="margin: 0px 0px 0px 10px; padding: 0px">
@@ -283,16 +283,16 @@
                 <strong>ID:</strong> {{ occurrence.event.Creator.user_id }}
               </p>
               <strong>Event ID:</strong> {{ occurrence.event.EventID }}<br />
-              <strong>Event Category:</strong> {{ occurrence.event.EventCategory.Name }}<br />
-              <strong>Priority Level:</strong> {{ occurrence.event.PriorityLevel.Name }}<br />
-              <strong>Repeat Pattern:</strong> {{ occurrence.event.RepeatPattern.Name }}<br />
-              <strong>Description:</strong> {{ occurrence.event.Description }}<br />
-              <strong>Reminder Time:</strong> {{ occurrence.event.ReminderTime }}<br />
-              <strong>Localization:</strong> {{ occurrence.event.Localization }}<br />
-              <strong>Duration:</strong> {{ occurrence.event.Duration }}<br />
-              <strong>Creation Date:</strong> {{ occurrence.event.CreationDate }}<br />
-              <strong>Color:</strong> {{ occurrence.event.Color }}<br />
-              <strong>First Occurrence:</strong> {{ occurrence.event.FirstOccurence }}<br />
+              <strong>Event Category:</strong> {{ occurrence.event.EventCategory.name }}<br />
+              <strong>Priority Level:</strong> {{ occurrence.event.PriorityLevel.name }}<br />
+              <strong>Repeat Pattern:</strong> {{ occurrence.event.RepeatPattern.name }}<br />
+              <strong>Description:</strong> {{ occurrence.event.description }}<br />
+              <strong>Reminder Time:</strong> {{ occurrence.event.reminder_time }}<br />
+              <strong>Localization:</strong> {{ occurrence.event.localization }}<br />
+              <strong>Duration:</strong> {{ occurrence.event.duration }}<br />
+              <strong>Creation Date:</strong> {{ occurrence.event.creation_date }}<br />
+              <strong>Color:</strong> {{ occurrence.event.color }}<br />
+              <strong>First Occurrence:</strong> {{ occurrence.event.first_occurence }}<br />
             </li>
           </div>
           {% endfor %}
