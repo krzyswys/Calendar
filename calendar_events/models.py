@@ -9,7 +9,6 @@ import exceptions as e
 
 from django.shortcuts import render
 
-# FIXME: instead of default values == "", set placeholders?
 # FIXME: set as default/none categories,priority levels, reapetpatterns ...
 # TODO: add status field as optional when creating new task
 # TODO: add standard duration for task_category: sysopy->kolejny tydzień
@@ -17,13 +16,6 @@ from django.shortcuts import render
 # TODO: measurments for substasks + task_occurences
 # TODO: add abiility to set completion_date of task in past
 # TODO: subcategories for events?
-# TODO: add start_date to task --> change calculate_task_time_by_...
-
-# FIXME: trzba doprecyzować jak repeatpattern.intervals działa, narazie zakładam że: powtarzanie co x dni + co x tygodni + co x miesiecy...
-# liczby się zamykają do kolejnego etapu: powtarzanie dzienne:max 7 dni, tygodniowe: max 4
-# Wydaje mi sie, ze nie musi tak byc. Moge ustawic powtarzanie np. co 100 dni i nie musze wtedy liczyc ile to jest miesiecy / tygodni / dni
-
-# number of repetitions chyba powinno być różne dla każdego pola?
 
 
 def index(request):
