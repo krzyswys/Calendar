@@ -1,6 +1,27 @@
+from datetime import timedelta
+
 from calendar_events.models import Tasks, PriorityLevels, TaskCategories
-from django.db.models import Sum, F, Avg, Count, Q, FloatField, When, Case
+from django.db.models import (
+    Sum,
+    F,
+    Avg,
+    Count,
+    Q,
+    FloatField,
+    When,
+    Case,
+    Value,
+    ExpressionWrapper,
+    CharField,
+    DateField,
+    DateTimeField,
+    DurationField,
+    IntegerField,
+)
 from django.utils import timezone
+from django.db.models.functions import Coalesce
+
+zero_date = timedelta(0)
 
 # FIXME: only one handler for calculate_average_completion_time_by_priority & calculate_average_completion_time_by_category
 
@@ -140,8 +161,10 @@ def percentage_tasks_completed_by_priority():
             if group["total_tasks"] > 0
             else 0
         )
-
-    return result
+    result_dict = {}
+    for item in result:
+        result_dict[item["priority_group"]] = item["percent_completed"]
+    return result_dict
 
 
 def percentage_tasks_completed_by_slidetime():
@@ -177,8 +200,10 @@ def percentage_tasks_completed_by_slidetime():
             if group["total_tasks"] > 0
             else 0
         )
-
-    return result
+    result_dict = {}
+    for item in result:
+        result_dict[item["priority_group"]] = item["percent_completed"]
+    return result_dict
 
 
 def percentage_tasks_completed_by_expectedtime():
@@ -210,45 +235,46 @@ def percentage_tasks_completed_by_expectedtime():
             else 0
         )
 
-    return result
+    result_dict = {}
+    for item in result:
+        result_dict[item["priority_group"]] = item["percent_completed"]
+    return result_dict
 
 
 def calculate_deadline_completion_percentage_by_category_till_now(deadline_now=True):
     if deadline_now:
         current_time = timezone.now()
-
-        tasks = Tasks.objects.filter(deadline__lte=current_time).select_related(
-            "task_category__name"
+        tasks = Tasks.objects.filter(deadline__lte=current_time).prefetch_related(
+            "task_category"
         )
     else:
-        tasks = Tasks.objects.all().select_related("task_category__name")
-        categories = tasks.values("task_category__name").annotate(
-            category_count=Count("task_category__name")
-        )
+        tasks = Tasks.objects.all().prefetch_related("task_category")
 
-    categories = tasks.values("task_category__name").annotate(
-        category_count=Count("task_category__name")
-    )
+    categories = TaskCategories.objects.all()
+
+    category_counts = {}
+    for task in tasks:
+        if task.task_category.name not in category_counts:
+            category_counts[task.task_category.name] = 1
+        else:
+            category_counts[task.task_category.name] += 1
 
     completed_tasks = tasks.filter(
         Q(completion_date__lte=F("deadline")) | Q(completion_date__isnull=True)
     )
-    completed_categories = completed_tasks.values("task_category__name").annotate(
-        completed_count=Count("task_category__name")
-    )
+
+    completed_category_counts = {}
+    for task in completed_tasks:
+        if task.task_category.name not in completed_category_counts:
+            completed_category_counts[task.task_category.name] = 1
+        else:
+            completed_category_counts[task.task_category.name] += 1
 
     percentages = {}
     for category in categories:
-        category_id = category["task_category__name"]
-        total_count = category["category_count"]
-        completed_count = next(
-            (
-                item["completed_count"]
-                for item in completed_categories
-                if item["task_category__name"] == category_id
-            ),
-            0,
-        )
+        category_id = category.name
+        total_count = category_counts.get(category_id, 0)
+        completed_count = completed_category_counts.get(category_id, 0)
         percentage = (
             round((completed_count / total_count) * 100, 2) if total_count > 0 else 0
         )
@@ -262,38 +288,39 @@ def calculate_slidetime_completion_percentage_by_category_till_now(slidetime_now
         current_time = timezone.now()
 
         tasks = Tasks.objects.filter(
-            F("acceptable_slide_time") + F("deadline") <= current_time
-        ).select_related("task_category__name")
+            acceptable_slide_time__lte=current_time - F("deadline")
+        ).select_related("task_category")
     else:
-        tasks = Tasks.objects.all().select_related("task_category__name")
-        categories = tasks.values("task_category__name").annotate(
-            category_count=Count("task_category__name")
-        )
-
+        tasks = Tasks.objects.all().select_related("task_category")
     categories = tasks.values("task_category__name").annotate(
         category_count=Count("task_category__name")
     )
+
+    categories = TaskCategories.objects.all()
+    category_counts = {}
+    for task in tasks:
+        if task.task_category.name not in category_counts:
+            category_counts[task.task_category.name] = 1
+        else:
+            category_counts[task.task_category.name] += 1
 
     completed_tasks = tasks.filter(
         Q(completion_date__lte=F("acceptable_slide_time"))
         | Q(completion_date__isnull=True)
     )
-    completed_categories = completed_tasks.values("task_category__name").annotate(
-        completed_count=Count("task_category__name")
-    )
+
+    completed_category_counts = {}
+    for task in completed_tasks:
+        if task.task_category.name not in completed_category_counts:
+            completed_category_counts[task.task_category.name] = 1
+        else:
+            completed_category_counts[task.task_category.name] += 1
 
     percentages = {}
     for category in categories:
-        category_id = category["task_category__name"]
-        total_count = category["category_count"]
-        completed_count = next(
-            (
-                item["completed_count"]
-                for item in completed_categories
-                if item["task_category__name"] == category_id
-            ),
-            0,
-        )
+        category_id = category.name
+        total_count = category_counts.get(category_id, 0)
+        completed_count = completed_category_counts.get(category_id, 0)
         percentage = (
             round((completed_count / total_count) * 100, 2) if total_count > 0 else 0
         )
@@ -307,40 +334,38 @@ def calculate_expectedtime_completion_percentage_by_category_till_now(
 ):
     if expectedtime_now:
         current_time = timezone.now()
-
         tasks = Tasks.objects.filter(
             expected_completion_date__lte=current_time
-        ).select_related("task_category__name")
+        ).prefetch_related("task_category")
     else:
-        tasks = Tasks.objects.all().select_related("task_category__name")
-        categories = tasks.values("task_category__name").annotate(
-            category_count=Count("task_category__name")
-        )
+        tasks = Tasks.objects.all().prefetch_related("task_category")
 
-    categories = tasks.values("task_category__name").annotate(
-        category_count=Count("task_category__name")
-    )
+    categories = TaskCategories.objects.all()
+
+    category_counts = {}
+    for task in tasks:
+        if task.task_category.name not in category_counts:
+            category_counts[task.task_category.name] = 1
+        else:
+            category_counts[task.task_category.name] += 1
 
     completed_tasks = tasks.filter(
         Q(completion_date__lte=F("expected_completion_date"))
         | Q(completion_date__isnull=True)
     )
-    completed_categories = completed_tasks.values("task_category__name").annotate(
-        completed_count=Count("task_category__name")
-    )
+
+    completed_category_counts = {}
+    for task in completed_tasks:
+        if task.task_category.name not in completed_category_counts:
+            completed_category_counts[task.task_category.name] = 1
+        else:
+            completed_category_counts[task.task_category.name] += 1
 
     percentages = {}
     for category in categories:
-        category_id = category["task_category__name"]
-        total_count = category["category_count"]
-        completed_count = next(
-            (
-                item["completed_count"]
-                for item in completed_categories
-                if item["task_category"] == category_id
-            ),
-            0,
-        )
+        category_id = category.name
+        total_count = category_counts.get(category_id, 0)
+        completed_count = completed_category_counts.get(category_id, 0)
         percentage = (
             round((completed_count / total_count) * 100, 2) if total_count > 0 else 0
         )
@@ -355,21 +380,60 @@ def calculate_average_completion_time_by_category(
     if deadline:
         average_completion_time_by_category = Tasks.objects.values(
             "task_category__name"
-        ).annotate(avg_completion_time=Avg(F("completion_date") - F("deadline")))
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("deadline")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            )
+        )
+
     elif slidetime:
         average_completion_time_by_category = Tasks.objects.values(
             "task_category__name"
         ).annotate(
-            avg_completion_time=Avg(
-                F("completion_date") - (F("acceptable_slide_time") + F("deadline"))
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(
+                                F("completion_date")
+                                - (F("acceptable_slide_time") + F("deadline"))
+                            ),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
             )
         )
+
     elif expectedtime:
         average_completion_time_by_category = Tasks.objects.values(
             "task_category__name"
         ).annotate(
-            avg_completion_time=Avg(
-                F("completion_date") - F("expected_completion_date")
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("expected_completion_date")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
             )
         )
 
@@ -387,21 +451,58 @@ def calculate_average_completion_time_by_priority(
     if deadline:
         average_completion_time_by_priority = Tasks.objects.values(
             "priority_level__priority_value"
-        ).annotate(avg_completion_time=Avg(F("completion_date") - F("deadline")))
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("deadline")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            )
+        )
     elif slidetime:
         average_completion_time_by_priority = Tasks.objects.values(
             "priority_level__priority_value"
         ).annotate(
-            avg_completion_time=Avg(
-                F("completion_date") - (F("acceptable_slide_time") + F("deadline"))
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(
+                                F("completion_date")
+                                - (F("acceptable_slide_time") + F("deadline"))
+                            ),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
             )
         )
     elif expectedtime:
         average_completion_time_by_priority = Tasks.objects.values(
             "priority_level__priority_value"
         ).annotate(
-            avg_completion_time=Avg(
-                F("completion_date") - F("expected_completion_date")
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("expected_completion_date")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
             )
         )
 
@@ -422,8 +523,13 @@ def calculate_task_time_by_category():
             .annotate(time_taken=F("completion_date") - F("creation_date"))
             .aggregate(total_time=Sum("time_taken"))
         )
-        results.append((category.name, task_time["total_time"]))
-    return results
+        results.append((category.name, task_time["total_time"] or 0))
+    print(results)
+    result_dict = {}
+    for item, value in results:
+        result_dict[item] = value
+    return result_dict
+    # return results
 
 
 def calculate_task_time_by_priority():
@@ -435,5 +541,9 @@ def calculate_task_time_by_priority():
             .annotate(time_taken=F("completion_date") - F("creation_date"))
             .aggregate(total_time=Sum("time_taken"))
         )
-        results.append((priority_level.priority_value, task_time["total_time"]))
-    return results
+        results.append((priority_level.priority_value, task_time["total_time"] or 0))
+    result_dict = {}
+    for item, value in results:
+        result_dict[item] = value
+    return result_dict
+    # return results
