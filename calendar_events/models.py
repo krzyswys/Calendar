@@ -10,9 +10,9 @@ import exceptions as e
 from django.shortcuts import render
 
 # FIXME: set as default/none categories,priority levels, reapetpatterns ...
-# TODO: add abiility to set completion_date of task in past
-# TODO: add status field as optional when creating new task
-# TODO: add standard duration for task_category: sysopy->kolejny tydzień
+# FIXME: split models.py into seperate files
+# TODO:connect to React
+
 
 # TODO: create subtasks logic
 # TODO: measurments for substasks + task_occurences
@@ -623,6 +623,7 @@ class TaskCategories(models.Model):
     default_localization = models.CharField(max_length=60)
     default_color = models.CharField(max_length=6)
     default_acceptable_slide_time = models.DurationField()
+    default_deadline = models.DurationField(null=True)
 
     def __str__(self):
         return self.name
@@ -637,6 +638,7 @@ class TaskCategories(models.Model):
         default_reminder_time: timedelta = None,
         default_localization: str = None,
         default_color: str = None,
+        default_deadline: timedelta = None,
     ):
         task_category = md.TaskCategories()
         task_category.task_category_creator = user
@@ -665,6 +667,9 @@ class TaskCategories(models.Model):
             task_category.default_color = "FFFFFF"
         else:
             task_category.default_color = default_color
+
+        if default_deadline is not None:
+            task_category.default_deadline = default_deadline
 
         try:
             task_category.save()
@@ -698,6 +703,7 @@ class TaskCategories(models.Model):
         default_reminder_time: timedelta = None,
         default_localization: str = None,
         default_color: str = None,
+        default_deadline: timedelta = None,
     ):
         if name is not None:
             self.name = name
@@ -719,6 +725,8 @@ class TaskCategories(models.Model):
 
         if default_color is not None:
             self.default_color = default_color
+        if default_deadline is not None:
+            self.default_deadline = default_deadline
 
         try:
             self.save()
@@ -750,7 +758,7 @@ class Tasks(models.Model):
         (1, "Finished"),
         (-1, "Not aplicable")
 
-    status = models.IntegerField(choices=StatusOptions)
+    status = models.IntegerField(choices=StatusOptions, blank=True, null=True)
 
     def __str__(self):
         return self.Name
@@ -770,6 +778,7 @@ class Tasks(models.Model):
         color: str = None,
         deadline: datetime = None,
         acceptable_slide_time: timedelta = None,
+        completion_time: datetime = None,
     ):
         task = md.Tasks()
         task.task_creator = user
@@ -779,7 +788,7 @@ class Tasks(models.Model):
         task.name = name
         task.expected_completion_date = expected_completion_date
         task.first_occurrence = first_occurrence
-        task.status = 0
+        # task.status = 0
 
         if description is None:
             task.description = ""
@@ -802,7 +811,7 @@ class Tasks(models.Model):
             task.color = color
 
         if deadline is None:
-            task.deadline = expected_completion_date
+            task.deadline = task_category.default_deadline
         else:
             task.deadline = deadline
 
@@ -810,6 +819,9 @@ class Tasks(models.Model):
             task.acceptable_slide_time = task_category.default_acceptable_slide_time
         else:
             task.acceptable_slide_time = acceptable_slide_time
+        if completion_time is not None:
+            task.acceptable_slide_time = completion_time
+            task.status = 1
 
         try:
             task.save()
@@ -868,6 +880,7 @@ class Tasks(models.Model):
         expected_completion_date: datetime = None,
         deadline: datetime = None,
         acceptable_slide_time: timedelta = None,
+        completion_time: datetime = None,
     ):
         if name is not None:
             self.name = name
@@ -901,7 +914,25 @@ class Tasks(models.Model):
 
         if acceptable_slide_time is not None:
             self.acceptable_slide_time = acceptable_slide_time
+        if completion_time is not None:
+            self.completion_date = completion_time
+            self.status = 1
 
+        try:
+            self.save()
+            return self
+        except IntegrityError:
+            raise e.EntityAlreadyExists("Cannot save task")
+
+    def check_task_done(
+        self,
+        date: datetime = None,
+    ):
+        if date is not None:
+            self.completion_date = date
+        else:
+            self.completion_date = datetime.now()
+        self.status = 1
         try:
             self.save()
             return self

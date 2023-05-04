@@ -129,9 +129,6 @@ def generate_task_categories(n=5):
         pr = PriorityLevels.objects.all()
         random_pr = random.choice(pr)
         description = random.choice([None, fake.paragraph()])
-        duration = random.choice(
-            [None, timedelta(minutes=fake.random_int(min=15, max=240))]
-        )
         reminder_time = timedelta(minutes=fake.random_int(min=5, max=60))
         localization = random.choice([None, fake.address()])
         color = random.choice([None, fake.hex_color()])
@@ -143,6 +140,13 @@ def generate_task_categories(n=5):
         )
         rp = RepeatPatterns.objects.all()
         random_rp = random.choice([None, random.choice(rp)])
+        now = datetime.now()
+        one_month_later = now + timedelta(
+            days=random.randint(0, 30),
+            hours=random.randint(0, 23),
+            minutes=random.randint(0, 59),
+            seconds=random.randint(0, 59),
+        )
 
         ev = TaskCategories.create_task_category(
             user=Users.get_user(login="some_user"),
@@ -153,6 +157,7 @@ def generate_task_categories(n=5):
             default_reminder_time=reminder_time,
             default_localization=localization,
             default_color=color,
+            # default_deadline=one_month_later,
         )
         # ev.save()
 
