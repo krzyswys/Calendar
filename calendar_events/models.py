@@ -13,11 +13,9 @@ from django.shortcuts import render
 # TODO: add abiility to set completion_date of task in past
 # TODO: add status field as optional when creating new task
 # TODO: add standard duration for task_category: sysopy->kolejny tydzień
-# TODO: compress statistic functions
 
 # TODO: create subtasks logic
 # TODO: measurments for substasks + task_occurences
-# TODO: subcategories for events?
 
 
 def index(request):

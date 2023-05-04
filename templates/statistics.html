@@ -287,7 +287,7 @@
   <thead>
     <tr>
       <th>category</th>
-      <th></th>
+      <th>time</th>
     </tr>
   </thead>
   <tbody>
@@ -303,7 +303,7 @@
   <thead>
     <tr>
       <th>priority</th>
-      <th></th>
+      <th>time</th>
     </tr>
   </thead>
   <tbody>
@@ -311,6 +311,38 @@
       <tr>
         <td>{{ priority }}</td>
         <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>name</th>
+      <th>efficency</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for id, ans in tasks_efficiencies.items %}
+      <tr>
+        <td>{{ ans.name }}</td>
+        <td>{{ ans.efficiency  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>name</th>
+      <th>efficency by priority</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for id, ans in tasks_efficiencies_priority.items %}
+      <tr>
+        <td>{{ ans.name }}</td>
+        <td>{{ ans.efficiency  }}</td>
       </tr>
     {% endfor %}
   </tbody>

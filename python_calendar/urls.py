@@ -20,5 +20,5 @@ from calendar_events.views import *
 
 urlpatterns = [
     path("", index, name="index"),
-    path("event_statistics", event_statistics, name="event_statistics"),
+    path("statistics", statistics, name="statistics"),
 ]
