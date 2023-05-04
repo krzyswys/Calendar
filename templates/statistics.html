@@ -1,0 +1,352 @@
+
+{% block content %}
+<head>
+  <meta charset="UTF-8" />
+  <head>
+    {%load static %}
+    <link rel="stylesheet" href="{% static 'css/stats.css' %}" />
+  </head>
+  <title>Calendar Events</title>
+</head>
+<div class="headerr">
+  <h1>Event Statistics</h1>
+</div>
+<div class="event-container">
+
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Duration Sum</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, duration_sum in categories_duration.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ duration_sum }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>Duration Sum</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, duration_sum in priority_duration.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ duration_sum }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table><table>
+  <thead>
+    <tr>
+      <th>location</th>
+      <th>count Sum</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for location, count_sum in location_stats.items %}
+      <tr>
+        <td>{{ location }}</td>
+        <td>{{ count_sum }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="headerr">
+  <h1>Task Statistics</h1>
+</div>
+<div class="task-container">
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>count Sum</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, count_sum in priority_stats.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ count_sum }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>completed_by_dealine</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, completed_by_dealine in percentage_tasks_deadline_completed.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ completed_by_dealine }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>completed_by_slidetime</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, completed_by_slidetime in percentage_tasks_completed_slidetime.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ completed_by_slidetime }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>completed_by_expectedtime</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, completed_by_expectedtime in percentage_tasks_completed_slidetime.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ completed_by_expectedtime }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>category</th>
+      <th>completed_by_deadine_by_now</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, percentage  in calculate_deadline_completion_percentage_category_till_now.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ percentage  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>category</th>
+      <th>completed_by_slidetime_by_now</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, percentage  in calculate_slidetime_completion_percentage_category_till_now.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ percentage  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>category</th>
+      <th>completed_by_expected_by_now</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, percentage  in calculate_expectedtime_completion_percentage_category_till_now.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ percentage  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>category</th>
+      <th>average completion time by category by deadline</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, time  in calculate_average_completion_time_category_deadline.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>category</th>
+      <th>average completion time by category by slidetime</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, time  in calculate_average_completion_time_category_slidetime.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>category</th>
+      <th>average completion time by category by expectedtime</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, time  in calculate_average_completion_time_category_expectedtime.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>average completion time by priority by deadline</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, time  in calculate_average_completion_time_priority_deadline.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>average completion time by priority by slidetime</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, time  in calculate_average_completion_time_prioritiy_slidetime.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>average completion time by priority by expectedtime</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, time  in calculate_average_completion_time_priority_expectedtime.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>category</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category, time  in calculate_task_time_category.items %}
+      <tr>
+        <td>{{ category }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>priority</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for priority, time  in calculate_task_time_priority.items %}
+      <tr>
+        <td>{{ priority }}</td>
+        <td>{{ time  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>name</th>
+      <th>efficency</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for id, ans in tasks_efficiencies.items %}
+      <tr>
+        <td>{{ ans.name }}</td>
+        <td>{{ ans.efficiency  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>name</th>
+      <th>efficency by priority</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for id, ans in tasks_efficiencies_priority.items %}
+      <tr>
+        <td>{{ ans.name }}</td>
+        <td>{{ ans.efficiency  }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% endblock %}
