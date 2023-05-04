@@ -2,7 +2,6 @@ from datetime import timedelta
 from django.db import models
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-import calendar_events.models as md
 import exceptions as e
 from calendar_events.models.users import Users
 from calendar_events.models.priorityLevels import PriorityLevels

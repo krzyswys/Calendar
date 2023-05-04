@@ -11,7 +11,6 @@ from calendar_events.models.notes import Notes
 
 from django.shortcuts import render
 
-# FIXME: set as default/none categories,priority levels, reapetpatterns ...
 # TODO: connect to React
 
 # TODO: create subtasks logic
