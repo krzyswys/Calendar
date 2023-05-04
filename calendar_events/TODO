@@ -1,0 +1,10 @@
+# TODO: create subtasks logic
+# TODO: measurments for substasks
+# TODO: connect to React
+# FIXME: calculate_efficiency_of_task, calculate_efficiency_with_priority_of_task account for subtask (and task occurences?)
+
+# NOTE: in order to change existing repeating parent previous task occurences must be deleted first
+# NOTE: parent task cant be removed
+# NOTE: do not allow to change occurence category
+# NOTE: timezone support is off
+# NOTE: consider if event/task could be 'abstract' and only occurences would be shown, then statistics could operate only on task/event_occurences

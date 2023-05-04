@@ -14,6 +14,8 @@ from django.db.models import (
     DurationField,
 )
 
+from calendar_events.models.tasks import TaskOccurrences
+
 zero_date = timedelta(0)
 
 
@@ -128,10 +130,13 @@ def percentage_tasks_completed_by_priority(
     deadline=True, slidetime=False, expectedtime=False, start_date=None, end_date=None
 ):
     tasks = Tasks.objects.all()
+    tasks_occurencies = TaskOccurrences.objects.all()
     if start_date:
         tasks = tasks.filter(start_time__gte=start_date)
+        tasks_occurencies = tasks_occurencies.filter(start_time__gte=start_date)
     if end_date:
         tasks = tasks.filter(end_time__lte=end_date)
+        tasks_occurencies = tasks_occurencies.filter(end_time__lte=end_date)
 
     priority_order = F("priority_level__priority_value")
 
@@ -172,15 +177,45 @@ def percentage_tasks_completed_by_priority(
         )
     )
 
+    result_for_occurences = (
+        tasks_occurencies.annotate(
+            priority_group=F("priority_level__priority_value"),
+            completed=completed_in_time,
+        )
+        .values("priority_group")
+        .order_by(priority_order)
+        .annotate(
+            total_tasks=Count("task_id"),
+            completed_tasks=Count("task_id", filter=completed_in_time),
+        )
+    )
+    merged_result = {}
     for group in result:
-        group["percent_completed"] = (
-            group["completed_tasks"] / group["total_tasks"] * 100
-            if group["total_tasks"] > 0
+        priority_group = group["priority_group"]
+        merged_result[priority_group] = {
+            "total_tasks": group["total_tasks"],
+            "completed_tasks": group["completed_tasks"],
+        }
+
+    for group in result_for_occurences:
+        priority_group = group["priority_group"]
+        if priority_group in merged_result:
+            merged_result[priority_group]["total_tasks"] += group["total_tasks"]
+            merged_result[priority_group]["completed_tasks"] += group["completed_tasks"]
+        else:
+            merged_result[priority_group] = {
+                "total_tasks": group["total_tasks"],
+                "completed_tasks": group["completed_tasks"],
+            }
+    for priority_group, group_data in merged_result.items():
+        group_data["percent_completed"] = (
+            group_data["completed_tasks"] / group_data["total_tasks"] * 100
+            if group_data["total_tasks"] > 0
             else 0
         )
     result_dict = {}
-    for item in result:
-        result_dict[item["priority_group"]] = item["percent_completed"]
+    for priority_group, group_data in merged_result.items():
+        result_dict[priority_group] = group_data["percent_completed"]
     return result_dict
 
 
@@ -188,13 +223,19 @@ def calculate_completion_percentage_by_category_till_now(
     deadline=True, slidetime=False, expectedtime=False, start_date=None, end_date=None
 ):
     tasks = Tasks.objects.all()
+    tasks_occurencies = TaskOccurrences.objects.all()
     if start_date:
         tasks = tasks.filter(start_time__gte=start_date)
+        tasks_occurencies = tasks_occurencies.filter(start_time__gte=start_date)
     if end_date:
         tasks = tasks.filter(end_time__lte=end_date)
+        tasks_occurencies = tasks_occurencies.filter(end_time__lte=end_date)
 
     if deadline:
         completed_tasks = tasks.filter(
+            Q(completion_date__lte=F("deadline")) | Q(completion_date__isnull=True)
+        )
+        completed_occurencies = tasks_occurencies.filter(
             Q(completion_date__lte=F("deadline")) | Q(completion_date__isnull=True)
         )
     elif slidetime:
@@ -203,8 +244,17 @@ def calculate_completion_percentage_by_category_till_now(
             | Q(completion_date__lte=F("deadline") + F("acceptable_slide_time"))
             | Q(completion_date__isnull=True)
         )
+        completed_occurencies = tasks_occurencies.filter(
+            Q(completion_date__gte=F("deadline"))
+            | Q(completion_date__lte=F("deadline") + F("acceptable_slide_time"))
+            | Q(completion_date__isnull=True)
+        )
     elif expectedtime:
         completed_tasks = tasks.filter(
+            Q(completion_date__lte=F("expected_completion_date"))
+            | Q(completion_date__isnull=True)
+        )
+        completed_occurencies = tasks_occurencies.filter(
             Q(completion_date__lte=F("expected_completion_date"))
             | Q(completion_date__isnull=True)
         )
@@ -217,9 +267,19 @@ def calculate_completion_percentage_by_category_till_now(
             category_counts[task.task_category.name] = 1
         else:
             category_counts[task.task_category.name] += 1
+    for task in tasks_occurencies:
+        if task.task_category.name not in category_counts:
+            category_counts[task.task_category.name] = 1
+        else:
+            category_counts[task.task_category.name] += 1
 
     completed_category_counts = {}
     for task in completed_tasks:
+        if task.task_category.name not in completed_category_counts:
+            completed_category_counts[task.task_category.name] = 1
+        else:
+            completed_category_counts[task.task_category.name] += 1
+    for task in completed_occurencies:
         if task.task_category.name not in completed_category_counts:
             completed_category_counts[task.task_category.name] = 1
         else:
@@ -242,10 +302,13 @@ def calculate_average_completion_time_by_category(
     deadline=True, slidetime=False, expectedtime=False, start_date=None, end_date=None
 ):
     tasks = Tasks.objects.all()
+    tasks_occurencies = TaskOccurrences.objects.all()
     if start_date:
         tasks = tasks.filter(start_time__gte=start_date)
+        tasks_occurencies = tasks_occurencies.filter(start_time__gte=start_date)
     if end_date:
         tasks = tasks.filter(end_time__lte=end_date)
+        tasks_occurencies = tasks_occurencies.filter(end_time__lte=end_date)
     if deadline:
         average_completion_time_by_category = tasks.values(
             "task_category__name"
@@ -262,7 +325,26 @@ def calculate_average_completion_time_by_category(
                     default=Value(zero_date),
                 ),
                 output_field=DurationField(),
-            )
+            ),
+            count=Count("task_id"),
+        )
+        average_completion_time_by_category_occurences = tasks_occurencies.values(
+            "task_category__name"
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("deadline")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            ),
+            count=Count("task_occurrence_id"),
         )
 
     elif slidetime:
@@ -284,7 +366,29 @@ def calculate_average_completion_time_by_category(
                     default=Value(zero_date),
                 ),
                 output_field=DurationField(),
-            )
+            ),
+            count=Count("task_id"),
+        )
+        average_completion_time_by_category_occurences = tasks_occurencies.values(
+            "task_category__name"
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(
+                                F("completion_date")
+                                - (F("acceptable_slide_time") + F("deadline"))
+                            ),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            ),
+            count=Count("task_occurrence_id"),
         )
 
     elif expectedtime:
@@ -303,25 +407,81 @@ def calculate_average_completion_time_by_category(
                     default=Value(zero_date),
                 ),
                 output_field=DurationField(),
-            )
+            ),
+            count=Count("task_id"),
+        )
+        average_completion_time_by_category_occurences = tasks_occurencies.values(
+            "task_category__name"
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("expected_completion_date")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            ),
+            count=Count("task_occurrence_id"),
         )
 
-    result = {}
+    merged_average_completion_time_by_category = {}
     for item in average_completion_time_by_category:
         category = item["task_category__name"]
-        result[category] = item["avg_completion_time"]
+        sumtime = item["avg_completion_time"] * item["count"]
+        count = item["count"]
+        merged_average_completion_time_by_category[category] = {
+            "sumtime": sumtime,
+            "count": count,
+        }
+    for item in average_completion_time_by_category_occurences:
+        if (
+            item["task_category__name"]
+            not in merged_average_completion_time_by_category
+        ):
+            category = item["task_category__name"]
+            sumtime = item["avg_completion_time"] * item["count"]
+            count = item["count"]
+            merged_average_completion_time_by_category[category] = {
+                "sumtime": sumtime,
+                "count": count,
+            }
+        else:
+            category = item["task_category__name"]
+            sumtime = (
+                item["avg_completion_time"] * item["count"]
+                + merged_average_completion_time_by_category[category]["sumtime"]
+            )
+            count = (
+                item["count"]
+                + merged_average_completion_time_by_category[category]["count"]
+            )
+            merged_average_completion_time_by_category[category] = {
+                "sumtime": sumtime,
+                "count": count,
+            }
 
-    return result
+    result_dict = {}
+    for category, group_data in merged_average_completion_time_by_category.items():
+        result_dict[category] = group_data["sumtime"] / group_data["count"]
+    return result_dict
 
 
 def calculate_average_completion_time_by_priority(
     deadline=True, slidetime=False, expectedtime=False, start_date=None, end_date=None
 ):
     tasks = Tasks.objects.all()
+    tasks_occurencies = TaskOccurrences.objects.all()
     if start_date:
         tasks = tasks.filter(start_time__gte=start_date)
+        tasks_occurencies = tasks_occurencies.filter(start_time__gte=start_date)
     if end_date:
         tasks = tasks.filter(end_time__lte=end_date)
+        tasks_occurencies = tasks_occurencies.filter(end_time__lte=end_date)
     if deadline:
         average_completion_time_by_priority = tasks.values(
             "priority_level__priority_value"
@@ -338,7 +498,26 @@ def calculate_average_completion_time_by_priority(
                     default=Value(zero_date),
                 ),
                 output_field=DurationField(),
-            )
+            ),
+            count=Count("task_id"),
+        )
+        average_completion_time_by_priority_occurrences = tasks_occurencies.values(
+            "priority_level__priority_value"
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("deadline")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            ),
+            count=Count("task_occurrence_id"),
         )
     elif slidetime:
         average_completion_time_by_priority = tasks.values(
@@ -359,7 +538,29 @@ def calculate_average_completion_time_by_priority(
                     default=Value(zero_date),
                 ),
                 output_field=DurationField(),
-            )
+            ),
+            count=Count("task_id"),
+        )
+        average_completion_time_by_priority_occurrences = tasks_occurencies.values(
+            "priority_level__priority_value"
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(
+                                F("completion_date")
+                                - (F("acceptable_slide_time") + F("deadline"))
+                            ),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            ),
+            count=Count("task_occurrence_id"),
         )
     elif expectedtime:
         average_completion_time_by_priority = tasks.values(
@@ -377,23 +578,79 @@ def calculate_average_completion_time_by_priority(
                     default=Value(zero_date),
                 ),
                 output_field=DurationField(),
-            )
+            ),
+            count=Count("task_id"),
+        )
+        average_completion_time_by_priority_occurrences = tasks_occurencies.values(
+            "priority_level__priority_value"
+        ).annotate(
+            avg_completion_time=ExpressionWrapper(
+                Case(
+                    When(
+                        completion_date__isnull=False,
+                        then=ExpressionWrapper(
+                            Avg(F("completion_date") - F("expected_completion_date")),
+                            output_field=DurationField(),
+                        ),
+                    ),
+                    default=Value(zero_date),
+                ),
+                output_field=DurationField(),
+            ),
+            count=Count("task_occurrence_id"),
         )
 
-    result = {}
+    merged_average_completion_time_by_category = {}
     for item in average_completion_time_by_priority:
         category = item["priority_level__priority_value"]
-        result[category] = item["avg_completion_time"]
+        sumtime = item["avg_completion_time"] * item["count"]
+        count = item["count"]
+        merged_average_completion_time_by_category[category] = {
+            "sumtime": sumtime,
+            "count": count,
+        }
+    for item in average_completion_time_by_priority_occurrences:
+        if (
+            item["priority_level__priority_value"]
+            not in merged_average_completion_time_by_category
+        ):
+            category = item["priority_level__priority_value"]
+            sumtime = item["avg_completion_time"] * item["count"]
+            count = item["count"]
+            merged_average_completion_time_by_category[category] = {
+                "sumtime": sumtime,
+                "count": count,
+            }
+        else:
+            category = item["priority_level__priority_value"]
+            sumtime = (
+                item["avg_completion_time"] * item["count"]
+                + merged_average_completion_time_by_category[category]["sumtime"]
+            )
+            count = (
+                item["count"]
+                + merged_average_completion_time_by_category[category]["count"]
+            )
+            merged_average_completion_time_by_category[category] = {
+                "sumtime": sumtime,
+                "count": count,
+            }
 
-    return result
+    result_dict = {}
+    for category, group_data in merged_average_completion_time_by_category.items():
+        result_dict[category] = group_data["sumtime"] / group_data["count"]
+    return result_dict
 
 
 def calculate_task_time_by_category(start_date=None, end_date=None):
     tasks = Tasks.objects.all()
+    tasks_occurencies = TaskOccurrences.objects.all()
     if start_date:
         tasks = tasks.filter(start_time__gte=start_date)
+        tasks_occurencies = tasks_occurencies.filter(start_time__gte=start_date)
     if end_date:
         tasks = tasks.filter(end_time__lte=end_date)
+        tasks_occurencies = tasks_occurencies.filter(end_time__lte=end_date)
     categories = TaskCategories.objects.all()
     results = []
     for category in categories:
@@ -403,18 +660,30 @@ def calculate_task_time_by_category(start_date=None, end_date=None):
             .aggregate(total_time=Sum("time_taken"))
         )
         results.append((category.name, task_time["total_time"] or 0))
+        task_time = (
+            tasks_occurencies.filter(task_category=category)
+            .annotate(time_taken=F("completion_date") - F("creation_date"))
+            .aggregate(total_time=Sum("time_taken"))
+        )
+        results.append((category.name, task_time["total_time"] or 0))
     result_dict = {}
     for item, value in results:
-        result_dict[item] = value
+        if item not in result_dict:
+            result_dict[item] = value
+        else:
+            result_dict[item] += value
     return result_dict
 
 
 def calculate_task_time_by_priority(start_date=None, end_date=None):
     tasks = Tasks.objects.all()
+    tasks_occurencies = TaskOccurrences.objects.all()
     if start_date:
         tasks = tasks.filter(start_time__gte=start_date)
+        tasks_occurencies = tasks_occurencies.filter(start_time__gte=start_date)
     if end_date:
         tasks = tasks.filter(end_time__lte=end_date)
+        tasks_occurencies = tasks_occurencies.filter(end_time__lte=end_date)
     priority_levels = PriorityLevels.objects.all()
     results = []
     for priority_level in priority_levels:
@@ -424,7 +693,16 @@ def calculate_task_time_by_priority(start_date=None, end_date=None):
             .aggregate(total_time=Sum("time_taken"))
         )
         results.append((priority_level.priority_value, task_time["total_time"] or 0))
+        task_time = (
+            tasks_occurencies.filter(priority_level=priority_level)
+            .annotate(time_taken=F("completion_date") - F("creation_date"))
+            .aggregate(total_time=Sum("time_taken"))
+        )
+        results.append((priority_level.priority_value, task_time["total_time"] or 0))
     result_dict = {}
     for item, value in results:
-        result_dict[item] = value
+        if item not in result_dict:
+            result_dict[item] = value
+        else:
+            result_dict[item] += value
     return result_dict
