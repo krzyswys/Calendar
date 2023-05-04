@@ -1,7 +1,17 @@
 import random
 from faker import Faker
-from calendar_events.models import *
-from datetime import timedelta
+from calendar_events.models.users import Users
+from calendar_events.models.eventCategories import EventCategories
+from calendar_events.models.priorityLevels import PriorityLevels
+from calendar_events.models.repeatPattern import RepeatPatterns
+from calendar_events.models.events import Events
+from calendar_events.models.events import EventOccurrences
+from calendar_events.models.taskCategories import TaskCategories
+from calendar_events.models.tasks import Tasks
+from calendar_events.models.tasks import TaskOccurrences
+from calendar_events.models.notes import Notes
+from datetime import datetime, timedelta
+
 
 # user is set to default as 'some_user'
 
