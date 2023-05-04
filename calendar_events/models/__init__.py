@@ -11,11 +11,6 @@ from calendar_events.models.notes import Notes
 
 from django.shortcuts import render
 
-# TODO: connect to React
-
-# TODO: create subtasks logic
-# TODO: measurments for substasks + task_occurences
-
 
 def index(request):
     users = Users.objects.all()

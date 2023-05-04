@@ -222,15 +222,14 @@ class Tasks(models.Model):
         start_date = task.first_occurrence
 
         for i in range(repeat_pattern.number_of_repetitions):
-            occurrence = TaskOccurrences.create_task_occurrence(
-                task=task, start_time=start_date
-            )
-
             start_date += relativedelta(
                 years=repeat_pattern.years_interval,
                 months=repeat_pattern.months_interval,
                 weeks=repeat_pattern.weeks_interval,
                 days=repeat_pattern.days_interval,
+            )
+            occurrence = TaskOccurrences.create_task_occurrence(
+                task=task, start_time=start_date
             )
 
 
@@ -239,11 +238,54 @@ class TaskOccurrences(models.Model):
     task = models.ForeignKey(Tasks, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
 
+    task_creator = models.ForeignKey(Users, on_delete=models.CASCADE, null=True)
+    task_category = models.ForeignKey(
+        TaskCategories, on_delete=models.CASCADE, null=True
+    )
+    priority_level = models.ForeignKey(
+        PriorityLevels, on_delete=models.CASCADE, null=True
+    )
+    repeat_pattern = models.ForeignKey(
+        RepeatPatterns, on_delete=models.CASCADE, null=True
+    )
+    name = models.CharField(max_length=60, null=True)
+    description = models.CharField(max_length=500, null=True)
+    reminder_time = models.DurationField(null=True)
+    localization = models.CharField(max_length=60, null=True)
+    creation_date = models.DateTimeField(default=datetime.now, null=True)
+    color = models.CharField(max_length=3, null=True)
+    expected_completion_date = models.DateTimeField(null=True)
+    deadline = models.DateTimeField(null=True)
+    acceptable_slide_time = models.DurationField(null=True)
+    first_occurrence = models.DateTimeField(null=True)
+    completion_date = models.DateTimeField(null=True)
+
+    class StatusOptions(models.IntegerChoices):
+        (0, "Not finished"),
+        (1, "Finished"),
+        (-1, "Not aplicable")
+
+    status = models.IntegerField(choices=StatusOptions, blank=True, null=True)
+
     @staticmethod
     def create_task_occurrence(task: Tasks, start_time: datetime):
         task_occurrence = TaskOccurrences()
         task_occurrence.task = task
         task_occurrence.start_time = start_time
+        task_occurrence.task_creator = task.task_creator
+        task_occurrence.task_category = task.task_category
+        task_occurrence.priority_level = task.priority_level
+        task_occurrence.repeat_pattern = task.repeat_pattern
+        task_occurrence.name = task.name
+        task_occurrence.description = task.description
+        task_occurrence.reminder_time = task.reminder_time
+        task_occurrence.localization = task.localization
+        task_occurrence.creation_date = datetime.now()
+        task_occurrence.color = task.color
+        task_occurrence.expected_completion_date = task.expected_completion_date
+        task_occurrence.deadline = task.deadline
+        task_occurrence.acceptable_slide_time = task.acceptable_slide_time
+        task_occurrence.first_occurrence = task.first_occurrence
 
         try:
             task_occurrence.save()
@@ -278,10 +320,58 @@ class TaskOccurrences(models.Model):
         except ObjectDoesNotExist:
             raise e.EntityNotFound("Cannot find such task occurrence")
 
-    def modify(self, task: Tasks = None):
+    def modify(
+        self,
+        task: Tasks = None,
+        name: str = None,
+        category: TaskCategories = None,
+        priority_level: PriorityLevels = None,
+        repeat_pattern: RepeatPatterns = None,
+        description: str = None,
+        reminder_time: timedelta = None,
+        localization: str = None,
+        color: str = None,
+        expected_completion_date: datetime = None,
+        deadline: datetime = None,
+        acceptable_slide_time: timedelta = None,
+        completion_time: datetime = None,
+    ):
         if task is not None:
             self.task = task
+        if name is not None:
+            self.name = name
 
+        if category is not None:
+            self.task_category = category
+
+        if priority_level is not None:
+            self.priority_level = priority_level
+        if repeat_pattern is not None:
+            self.repeat_pattern = repeat_pattern
+
+        if description is not None:
+            self.description = description
+
+        if reminder_time is not None:
+            self.reminder_time = reminder_time
+
+        if localization is not None:
+            self.localization = localization
+
+        if color is not None:
+            self.color = color
+
+        if expected_completion_date is not None:
+            self.expected_completion_date = expected_completion_date
+
+        if deadline is not None:
+            self.deadline = deadline
+
+        if acceptable_slide_time is not None:
+            self.acceptable_slide_time = acceptable_slide_time
+        if completion_time is not None:
+            self.completion_date = completion_time
+            self.status = 1
         try:
             self.save()
             return self

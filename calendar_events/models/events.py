@@ -173,15 +173,14 @@ class Events(models.Model):
         start_date = event.first_occurrence
 
         for i in range(repeat_pattern.number_of_repetitions):
-            occurrence = EventOccurrences.create_event_occurrence(
-                event=event, start_time=start_date
-            )
-
             start_date += relativedelta(
                 years=repeat_pattern.years_interval,
                 months=repeat_pattern.months_interval,
                 weeks=repeat_pattern.weeks_interval,
                 days=repeat_pattern.days_interval,
+            )
+            occurrence = EventOccurrences.create_event_occurrence(
+                event=event, start_time=start_date
             )
 
 
@@ -190,11 +189,37 @@ class EventOccurrences(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
 
+    event_creator = models.ForeignKey(Users, on_delete=models.CASCADE)
+    event_category = models.ForeignKey(EventCategories, on_delete=models.CASCADE)
+    priority_level = models.ForeignKey(PriorityLevels, on_delete=models.CASCADE)
+    repeat_pattern = models.ForeignKey(RepeatPatterns, on_delete=models.CASCADE)
+    name = models.CharField(max_length=60)
+    description = models.CharField(max_length=500)
+    reminder_time = models.DurationField()
+    localization = models.CharField(max_length=60)
+    duration = models.DurationField()
+    creation_date = models.DateTimeField(default=datetime.now)
+    color = models.CharField(max_length=3)
+    first_occurrence = models.DateTimeField(default=datetime.now)
+
     @staticmethod
     def create_event_occurrence(event: Events, start_time: datetime):
         event_occurrence = EventOccurrences()
         event_occurrence.event = event
         event_occurrence.start_time = start_time
+
+        event_occurrence.event_creator = event.event_creator
+        event_occurrence.event_category = event.event_category
+        event_occurrence.priority_level = event.priority_level
+        event_occurrence.repeat_pattern = event.repeat_pattern
+        event_occurrence.name = event.name
+        event_occurrence.description = event.description
+        event_occurrence.reminder_time = event.reminder_time
+        event_occurrence.localization = event.localization
+        event_occurrence.duration = event.duration
+        event_occurrence.creation_date = datetime.now()
+        event_occurrence.color = event.color
+        event_occurrence.first_occurrence = datetime.now()
 
         try:
             event_occurrence.save()
@@ -235,10 +260,47 @@ class EventOccurrences(models.Model):
         except ObjectDoesNotExist:
             raise e.EntityNotFound("Cannot find specified event occurrences")
 
-    def modify(self, event: Events = None):
+    def modify(
+        self,
+        event: Events = None,
+        event_category: EventCategories = None,
+        name: str = None,
+        description: str = None,
+        duration: timedelta = None,
+        repeat_pattern: RepeatPatterns = None,
+        priority_level: PriorityLevels = None,
+        reminder_time: timedelta = None,
+        localization: str = None,
+        color: str = None,
+    ):
         if event is not None:
             self.event = event
+        if event_category is not None:
+            self.event_category = event_category
 
+        if name is not None:
+            self.name = name
+
+        if description is not None:
+            self.description = description
+
+        if duration is not None:
+            self.duration = duration
+
+        if repeat_pattern is not None:
+            self.repeat_pattern = repeat_pattern
+
+        if priority_level is not None:
+            self.priority_level = priority_level
+
+        if reminder_time is not None:
+            self.reminder_time = reminder_time
+
+        if localization is not None:
+            self.localization = localization
+
+        if color is not None:
+            self.color = color
         try:
             self.save()
             return self

@@ -279,20 +279,20 @@
               <strong>Start Time:</strong> {{ occurrence.start_time }}<br />
               <strong>Creator:</strong>
               <p style="margin: 0px 0px 0px 10px; padding: 0px">
-                <strong>Name:</strong> {{ occurrence.event.Creator.login }}<br />
-                <strong>ID:</strong> {{ occurrence.event.Creator.user_id }}
+                <strong>Name:</strong> {{ occurrence.event_creator.login }}<br />
+                <strong>ID:</strong> {{ occurrence.event_creator.user_id }}
               </p>
-              <strong>Event ID:</strong> {{ occurrence.event.EventID }}<br />
-              <strong>Event Category:</strong> {{ occurrence.event.EventCategory.name }}<br />
-              <strong>Priority Level:</strong> {{ occurrence.event.PriorityLevel.name }}<br />
-              <strong>Repeat Pattern:</strong> {{ occurrence.event.RepeatPattern.name }}<br />
-              <strong>Description:</strong> {{ occurrence.event.description }}<br />
-              <strong>Reminder Time:</strong> {{ occurrence.event.reminder_time }}<br />
-              <strong>Localization:</strong> {{ occurrence.event.localization }}<br />
-              <strong>Duration:</strong> {{ occurrence.event.duration }}<br />
-              <strong>Creation Date:</strong> {{ occurrence.event.creation_date }}<br />
-              <strong>Color:</strong> {{ occurrence.event.color }}<br />
-              <strong>First Occurrence:</strong> {{ occurrence.event.first_occurence }}<br />
+              <strong>Event ID:</strong> {{ occurrence.event_occurrence_id }}<br />
+              <strong>Event Category:</strong> {{ occurrence.event_category.name }}<br />
+              <strong>Priority Level:</strong> {{ occurrence.priority_level.name }}<br />
+              <strong>Repeat Pattern:</strong> {{ occurrence.repeat_pattern.name }}<br />
+              <strong>Description:</strong> {{ occurrence.description }}<br />
+              <strong>Reminder Time:</strong> {{ occurrence.reminder_time }}<br />
+              <strong>Localization:</strong> {{ occurrence.localization }}<br />
+              <strong>Duration:</strong> {{ occurrence.duration }}<br />
+              <strong>Creation Date:</strong> {{ occurrence.creation_date }}<br />
+              <strong>Color:</strong> {{ occurrence.color }}<br />
+              <strong>First Occurrence:</strong> {{ occurrence.first_occurence }}<br />
             </li>
           </div>
           {% endfor %}
@@ -306,18 +306,18 @@
             {% for task_occurrence in tasks_occurences %}
             <div class="list-item-container">
                 <li>
-                    <strong>Name:</strong> {{ task_occurrence.task.name }}<br>
-                    <strong>Description:</strong> {{ task_occurrence.task.description }}<br>
-                    <strong>Creator:</strong> {{ task_occurrence.task.task_creator.login }}<br>
-                    <strong>Category:</strong> {{ task_occurrence.task.task_category.name }}<br>
-                    <strong>Priority Level:</strong> {{ task_occurrence.task.priority_level.name }}<br>
-                    <strong>Repeat Pattern:</strong> {{ task_occurrence.task.repeat_pattern.name }}<br>
-                    <strong>Localization:</strong> {{ task_occurrence.task.localization }}<br>
-                    <strong>Reminder Time:</strong> {{ task_occurrence.task.reminder_time }}<br>
-                    <strong>Expected Completion Date:</strong> {{ task_occurrence.task.expected_completion_date }}<br>
-                    <strong>Deadline:</strong> {{ task_occurrence.task.deadline }}<br>
-                    <strong>Acceptable Slide Time:</strong> {{ task_occurrence.task.acceptable_slide_time }}<br>
-                    <strong>First Occurrence:</strong> {{ task_occurrence.task.first_occurrence }}<br>
+                    <strong>Name:</strong> {{ task_occurrence.name }}<br>
+                    <strong>Description:</strong> {{ task_occurrence.description }}<br>
+                    <strong>Creator:</strong> {{ task_occurrence.task_creator.login }}<br>
+                    <strong>Category:</strong> {{ task_occurrence.task_category.name }}<br>
+                    <strong>Priority Level:</strong> {{ task_occurrence.priority_level.name }}<br>
+                    <strong>Repeat Pattern:</strong> {{ task_occurrence.repeat_pattern.name }}<br>
+                    <strong>Localization:</strong> {{ task_occurrence.localization }}<br>
+                    <strong>Reminder Time:</strong> {{ task_occurrence.reminder_time }}<br>
+                    <strong>Expected Completion Date:</strong> {{ task_occurrence.expected_completion_date }}<br>
+                    <strong>Deadline:</strong> {{ task_occurrence.deadline }}<br>
+                    <strong>Acceptable Slide Time:</strong> {{ task_occurrence.acceptable_slide_time }}<br>
+                    <strong>First Occurrence:</strong> {{ task_occurrence.first_occurrence }}<br>
                     <strong>Start Time:</strong> {{ task_occurrence.start_time }}<br>
                 </li>
             </div>
