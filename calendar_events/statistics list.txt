@@ -20,3 +20,12 @@
 - ile czasu sumarycznie zajmują eventy danej kategorii
 - % eventow  w danej lokalizacji
 - % eventow o danym priority level
+
+Podzadania:
+- Całkowity czas spędzony na zadanie + jego podzadania
+- Procent wykonania zadania, wliczając jego podzadania (100 * liczba wykonanych podzadań / liczba wszystkich podzadań)
+- Zadanie + jego podzadania - ile zostało wykonanych w oczekiwanym czasie, ile w oczekiwanym czasie plus poślizg, ile przed deadline, ile po deadline
+- Średni czas pomiędzy wykonaniem podzadań, a ich oczekiwaną datą wykonania
+- Średni czas pomiedzy wykonaniem podzadań, a ich oczekiwaną datą wykonania + poślizg (jeśli zostały wykonane po oczekiwanej dacie)
+- Średni czas pomiędzy wykonaniem podzadań, a ich deadline (jeśli nie zostały wykonane do oczekiwanej daty + poślizg)
+- Średni czas pomiędzy deadlinem, a wykonaniem podzadań (jeśli zostały wykonane po deadline)

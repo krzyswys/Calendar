@@ -28,6 +28,7 @@ class Tasks(models.Model):
     acceptable_slide_time = models.DurationField()
     first_occurrence = models.DateTimeField()
     completion_date = models.DateTimeField(null=True)
+    parent_task = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
 
     class StatusOptions(models.IntegerChoices):
         (0, "Not finished"),
@@ -55,6 +56,7 @@ class Tasks(models.Model):
         deadline: datetime = None,
         acceptable_slide_time: timedelta = None,
         completion_time: datetime = None,
+        parent_task = None
     ):
         task = Tasks()
         task.task_creator = user
@@ -99,6 +101,11 @@ class Tasks(models.Model):
             task.acceptable_slide_time = completion_time
             task.status = 1
 
+        if parent_task is not None:
+            task.parent_task = parent_task
+        else:
+            task.parent_task = None
+
         try:
             task.save()
             return task
@@ -114,6 +121,7 @@ class Tasks(models.Model):
         localization: str = None,
         expected_completion_date: datetime = None,
         deadline: datetime = None,
+        parent_task = None
     ):
         try:
             all_tasks = Tasks.objects.all()
@@ -138,6 +146,9 @@ class Tasks(models.Model):
 
             if deadline is not None:
                 all_tasks.filter(deadline=deadline)
+
+            if parent_task is not None:
+                all_tasks.filter(parent_task=parent_task)
 
             return all_tasks
         except ObjectDoesNotExist:
@@ -232,6 +243,25 @@ class Tasks(models.Model):
                 task=task, start_time=start_date
             )
 
+    def get_all_subtasks(self):
+        tasks = [self]
+        parents = [self]
+
+        while True:
+            res = []
+
+            for parent in parents:
+                res.extend(list(Tasks.get_tasks(parent_task=parent)))
+
+            if len(res) == 0:
+                break
+
+            tasks.extend(res)
+            parents = res
+
+
+        return tasks
+
 
 class TaskOccurrences(models.Model):
     task_occurrence_id = models.BigAutoField(primary_key=True)
@@ -295,10 +325,10 @@ class TaskOccurrences(models.Model):
 
     @staticmethod
     def get_task_occurrences(
-        task_occurrence_id: int,
-        task: Tasks,
-        time_start: datetime,
-        time_stop: datetime,
+        task_occurrence_id: int = None,
+        task: Tasks = None,
+        time_start: datetime = None,
+        time_stop: datetime = None,
     ):
         try:
             all_occurrences = TaskOccurrences.objects.all()

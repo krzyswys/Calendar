@@ -1,5 +1,5 @@
 from datetime import timedelta
-from calendar_events.models import Tasks, PriorityLevels, TaskCategories
+from calendar_events.models import Tasks, PriorityLevels, TaskCategories, TaskOccurrences
 from django.db.models import (
     Sum,
     F,
@@ -706,3 +706,110 @@ def calculate_task_time_by_priority(start_date=None, end_date=None):
         else:
             result_dict[item] += value
     return result_dict
+
+
+#Returns time taken by a task with its all subtasks
+def calculate_time_spend_with_subtasks(task: Tasks, start_date=None, end_date=None):
+    tasks = task.get_all_subtasks()
+
+    task_occurrences = TaskOccurrences.get_task_occurrences(task__in=tasks)
+
+    if start_date is not None:
+        task_occurrences.filter(start_time__gte=start_date)
+
+    if end_date is not None:
+        task_occurrences.filter(start_date__lte=end_date)
+
+    time = task_occurrences.annotate(time_taken=F("completion_date") - F("creation_date")).aggregate(total_time=Sum("time_taken"))
+
+    return time['total_time']
+
+
+#Returns task completion in percents (calculated by counting done subtasks)
+def calculate_task_completion_with_subtasks(task: Tasks):
+    tasks = task.get_all_subtasks()
+
+    task_occurrences = TaskOccurrences.get_task_occurrences(task__in=tasks)
+
+    all_tasks_number = len(task_occurrences)
+
+    task_occurrences.filter(status=1)
+
+    finished_tasks_number = len(task_occurrences)
+
+    return (finished_tasks_number / all_tasks_number) * 100
+
+
+#Returns tuple with 4 numbers measuring completion date: before expected completion time, before expected + slide time, before deadline, after deadline.
+#Counters do not stack: if a task was completed before expected time (so it was also completed before expected + slide, deadline...) only the first counter is incremented.
+def calculate_completion_number_by_completion_time_with_subtasks(task: Tasks):
+    tasks = task.get_all_subtasks()
+
+    task_occurrences = TaskOccurrences.get_task_occurrences(task__in=tasks)
+
+    expected_time = 0
+    slide_time = 0
+    deadline = 0
+    after_deadline = 0
+
+    for task in task_occurrences:
+        if task.completion_date is None:
+            continue
+
+        if task.completion_date <= task.expected_completion_date:
+            expected_time += 1
+        elif task.completion_date <= task.expected_completion_date + task.acceptable_slide_time:
+            slide_time += 1
+        elif task.completion_date <= task.deadline:
+            deadline += 1
+        else:
+            after_deadline += 1
+
+    return expected_time, slide_time, deadline, after_deadline
+
+
+#Returns average expected_completion_date - completion_date for subtasks which were completed before expected date
+def calculate_mean_completion_before_expected_time_with_subtasks(task: Tasks):
+    tasks = task.get_all_subtasks()
+
+    task_occurrences = TaskOccurrences.get_task_occurrences(task__in=tasks).filter(completion_date__isnull=False).filter(completion_date__lte=F('expected_completion_date'))
+
+    time = task_occurrences.annotate(time_taken=F("expected_completion_date") - F("completion_date")).aggregate(total_time=Avg("time_taken"))
+
+    return time['total_time']
+
+#Returns average (expected_completion_date + slide_time) - completion_date for subtasks, which were completed before expected_date + slide and after expected_date
+def calculate_mean_completion_before_expected_time_plus_slide_with_subtasks(task: Tasks):
+    tasks = task.get_all_subtasks()
+
+    task_occurrences = TaskOccurrences.get_task_occurrences(task__in=tasks).filter(completion_date__isnull=False)\
+        .filter(completion_date__lte=(F('expected_completion_date') + F('acceptable_slide_time')))\
+        .filter(completion_date__gt=F('expected_completion_date'))
+
+    time = task_occurrences.annotate(time_taken=(F('expected_completion_date') + F('acceptable_slide_time')) - F("completion_date")).aggregate(total_time=Avg("time_taken"))
+
+    return time['total_time']
+
+#Returns average deadline - completion_date for subtasks, which were completed before deadline and after expected_date + slide
+def calculate_mean_completion_before_deadline_with_subtasks(task: Tasks):
+    tasks = task.get_all_subtasks()
+
+    task_occurrences = TaskOccurrences.get_task_occurrences(task__in=tasks).filter(completion_date__isnull=False)\
+        .filter(completion_date__lte=F('deadline'))\
+        .filter(completion_date__gt=(F('expected_completion_date') + F('acceptable_slide_time')))
+
+    time = task_occurrences.annotate(time_taken=F('deadline') - F("completion_date")).aggregate(total_time=Avg("time_taken"))
+
+    return time['total_time']
+
+
+#Returns average completion_date - deadline for subtasks, which were completed after the deadline
+def calculate_mean_completion_after_deadline_with_subtasks(task: Tasks):
+    tasks = task.get_all_subtasks()
+
+    task_occurrences = TaskOccurrences.get_task_occurrences(task__in=tasks).filter(completion_date__isnull=False)\
+        .filter(completion_date__gt=F('deadline'))
+
+    time = task_occurrences.annotate(time_taken=F('completion_date') - F("deadline")).aggregate(total_time=Avg("time_taken"))
+
+    return time['total_time']
