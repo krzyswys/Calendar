@@ -2,3 +2,4 @@ _pycache_/
 staticfiles/
 migrations/
 db.sqllite3
+node_modules

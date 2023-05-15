@@ -1,7 +1,9 @@
-# TODO: create subtasks logic
-# TODO: measurments for substasks
+
+# FIXME: reapat patterns must modify data after change
+# FIXME: when removing evnet remove occurences
 # TODO: connect to React
 # FIXME: calculate_efficiency_of_task, calculate_efficiency_with_priority_of_task account for subtask (and task occurences?)
+# TODO: split views into static html and REST views
 
 # NOTE: in order to change existing repeating parent previous task occurences must be deleted first
 # NOTE: parent task cant be removed

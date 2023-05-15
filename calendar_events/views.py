@@ -102,3 +102,42 @@ def statistics(request):
         "tasks_efficiencies_priority": tasks_efficiencies_priority,
     }
     return render(request, "statistics.html", context)
+
+
+from rest_framework.decorators import api_view
+from .models.events import *
+from rest_framework.response import Response
+from .serializer import *
+from django.shortcuts import render
+
+
+@api_view(["GET"])
+def getEvents(request):
+    events = Events.objects.all()
+    serializer = EventSerializer(events, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getEvent(request, pk):
+    event = Events.objects.filter(event_id=pk).first()
+    serializer = EventSerializer(event)
+    return Response(serializer.data)
+
+
+@api_view(["PUT"])
+def updateEvent(request, pk):
+    data = request.data
+    event = Events.objects.filter(event_id=pk).first()
+    event.modify(
+        description=data["description"],
+    )
+    serializer = EventSerializer(event)
+    return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+def deleteEvent(request, pk):
+    event = Events.objects.filter(event_id=pk).first()
+    event.delete()
+    return Response("Event deleted")

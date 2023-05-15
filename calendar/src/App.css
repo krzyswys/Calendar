@@ -1,0 +1,132 @@
+.app-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100vw;
+}
+
+.eventslistpage-event-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.listitem-container {
+    background-color: rgb(149, 178, 250);
+    box-shadow: 0px 0px 20px 1px rgb(116, 116, 116);
+    border-radius: 5px;
+    padding: 10px;
+    width: 300px;
+    margin: 10px;
+    height: auto;
+    /* Zmieniłem wysokość na automatyczną, aby dopasować do zawartości */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-decoration: none;
+}
+
+.listitem-container:hover {
+    transform: scale(1.02);
+    /* Poprawiłem właściwość "scale" na "transform: scale" */
+    background-color: rgb(127, 162, 250);
+    box-shadow: 0px 0px 20px 1px rgb(76, 76, 76);
+    transition: 0.3s;
+}
+
+.listitem-container .event-details {
+    padding: 10px;
+    /* Dodałem wewnętrzne marginesy dla elementów szczegółów */
+}
+
+.listitem-container>.event-details>p,
+.listitem-container>.event-details>h3 {
+    margin: 5px 0;
+    text-align: center;
+    color: black;
+    text-decoration: none;
+}
+
+.listitem-container>.event-details>h3 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.listitem-container>.event-details>p {
+    font-size: 16px;
+}
+
+.listitem-container>.event-details>p:first-child {
+    margin-top: 10px;
+}
+
+.listitem-container>.event-details>p:last-child {
+    margin-bottom: 10px;
+}
+
+
+.event-page-container {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    width: 1100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.event-container {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px;
+    max-width: 600px;
+}
+
+.event-container p {
+    margin: 5px 0;
+}
+
+.event-container p:first-child {
+    font-weight: bold;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+textarea {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.event-action-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 50%;
+    margin: 20px;
+}
