@@ -145,9 +145,6 @@ class Events(models.Model):
         if duration is not None:
             self.duration = duration
 
-        if repeat_pattern is not None:
-            self.repeat_pattern = repeat_pattern
-
         if priority_level is not None:
             self.priority_level = priority_level
 
@@ -159,6 +156,14 @@ class Events(models.Model):
 
         if color is not None:
             self.color = color
+
+        if repeat_pattern is not None:
+            self.repeat_pattern = repeat_pattern
+
+            occurrences = EventOccurrences.get_event_occurrences(event=self)
+            occurrences.delete()
+
+            Events.apply_event_pattern_for(self)
 
         try:
             self.save()
@@ -263,7 +268,6 @@ class EventOccurrences(models.Model):
     def modify(
         self,
         event: Events = None,
-        event_category: EventCategories = None,
         name: str = None,
         description: str = None,
         duration: timedelta = None,
@@ -275,8 +279,6 @@ class EventOccurrences(models.Model):
     ):
         if event is not None:
             self.event = event
-        if event_category is not None:
-            self.event_category = event_category
 
         if name is not None:
             self.name = name

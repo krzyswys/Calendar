@@ -110,6 +110,7 @@ from rest_framework.response import Response
 from .serializer import *
 from django.shortcuts import render
 
+# Events views
 
 @api_view(["GET"])
 def getEvents(request):
@@ -141,3 +142,141 @@ def deleteEvent(request, pk):
     event = Events.objects.filter(event_id=pk).first()
     event.delete()
     return Response("Event deleted")
+
+
+@api_view(["GET"])
+def getEventCategories(request):
+    categories = EventCategories.objects.all()
+    serializer = EventCategoriesSerializer(categories, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getEventOccurrences(request):
+    occurrences = EventOccurrences.objects.all()
+    serializer = EventOccurrencesSerializer(occurrences, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getEventOccurrencesFromInterval(request, start_time, end_time):
+    # Pattern: day-month-year
+    start_day, start_month, start_year = start_time.split('-')
+    end_day, end_month, end_year = end_time.split('-')
+
+    start_time = datetime(int(start_year), int(start_month), int(start_day))
+    end_time = datetime(int(end_year), int(end_month), int(end_day))
+
+    occurrences = EventOccurrences.get_event_occurrences(time_start=start_time, time_stop=end_time)
+    serializer = EventOccurrencesSerializer(occurrences, many=True)
+    return Response(serializer.data)
+
+
+# Tasks views
+
+@api_view(["GET"])
+def getTasks(request):
+    tasks = Tasks.objects.all()
+    serializer = TaskSerializer(tasks, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getTask(request, pk):
+    task = Tasks.objects.filter(event_id=pk).first()
+    serializer = TaskSerializer(task)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getTaskCategories(request):
+    categories = TaskCategories.objects.all()
+    serializer = TaskCategoriesSerializer(categories, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getTaskOccurrences(request):
+    occurrences = TaskOccurrences.objects.all()
+    serializer = TaskOccurrencesSerializer(occurrences, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getTaskOccurrencesFromInterval(request, start_time, end_time):
+    start_day, start_month, start_year = start_time.split('-')
+    end_day, end_month, end_year = end_time.split('-')
+
+    start_time = datetime(int(start_year), int(start_month), int(start_day))
+    end_time = datetime(int(end_year), int(end_month), int(end_day))
+
+    occurrences = TaskOccurrences.get_task_occurrences(time_start=start_time, time_stop=end_time)
+    serializer = TaskOccurrencesSerializer(occurrences, many=True)
+    return Response(serializer.data)
+
+
+# Notes views
+
+
+@api_view(["GET"])
+def getNotes(request):
+    notes = Notes.objects.all()
+    serializer = NotesSerializer(notes, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getNote(request, pk):
+    note = Notes.objects.filter(note_id=pk).first()
+    serializer = NotesSerializer(note, many=False)
+    return Response(serializer.data)
+
+
+# Priority levels views
+
+
+@api_view(["GET"])
+def getPriorityLevels(request):
+    levels = PriorityLevels.objects.all()
+    serializer = PriorityLevelsSerializer(levels, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getPriorityLevel(request, pk):
+    level = PriorityLevels.objects.filter(priority_level_id=pk).first()
+    serializer = PriorityLevelsSerializer(level, many=False)
+    return Response(serializer.data)
+
+# Repeat patterns views
+
+
+@api_view(["GET"])
+def getRepeatPatterns(request):
+    patterns = RepeatPatterns.objects.all()
+    serializer = RepeatPatternsSerializer(patterns, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getRepeatPattern(request, pk):
+    pattern = RepeatPatterns.objects.filter(repeat_pattern_id=pk)
+    serializer = RepeatPatternsSerializer(pattern, many=False)
+    return Response(serializer.data)
+
+
+# Users views
+
+
+@api_view(["GET"])
+def getUsers(request):
+    users = Users.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def getUser(request, pk):
+    user = Users.objects.filter(user_id=pk).first()
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)

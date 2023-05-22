@@ -3,10 +3,12 @@
 # FIXME: when removing evnet remove occurences
 # TODO: connect to React
 # FIXME: calculate_efficiency_of_task, calculate_efficiency_with_priority_of_task account for subtask (and task occurences?)
+# FIXME: Answer to line above. i think we calculate efficiency of a task by counting number of done task occurrences
+
 # TODO: split views into static html and REST views
 
-# NOTE: in order to change existing repeating parent previous task occurences must be deleted first
-# NOTE: parent task cant be removed
-# NOTE: do not allow to change occurence category
+# NOTE: in order to change existing repeating parent previous task occurences must be deleted first <- Done, added same logic to events
+# NOTE: parent task cant be removed <- Option on_delete=CASCADE is set, I think it would work. If we delete parent just delete all children
+# NOTE: do not allow to change occurence category <- Deleted possibility to change occurrence category from modify method
 # NOTE: timezone support is off
-# NOTE: consider if event/task could be 'abstract' and only occurences would be shown, then statistics could operate only on task/event_occurences
+# NOTE: consider if event/task could be 'abstract' and only occurences would be shown, then statistics could operate only on task/event_occurences <- I think that was the plan since the beginning :) That's why we have separated Events from EventsOccurrences (same for tasks)

@@ -178,9 +178,6 @@ class Tasks(models.Model):
         if priority_level is not None:
             self.priority_level = priority_level
 
-        if repeat_pattern is not None:
-            self.repeat_pattern = repeat_pattern
-
         if description is not None:
             self.description = description
 
@@ -204,6 +201,14 @@ class Tasks(models.Model):
         if completion_time is not None:
             self.completion_date = completion_time
             self.status = 1
+
+        if repeat_pattern is not None:
+            self.repeat_pattern = repeat_pattern
+
+            occurrences = TaskOccurrences.get_task_occurrences(task=self)
+            occurrences.delete()
+
+            Tasks.apply_task_pattern_for(self)
 
         try:
             self.save()
@@ -354,7 +359,6 @@ class TaskOccurrences(models.Model):
         self,
         task: Tasks = None,
         name: str = None,
-        category: TaskCategories = None,
         priority_level: PriorityLevels = None,
         repeat_pattern: RepeatPatterns = None,
         description: str = None,
@@ -370,9 +374,6 @@ class TaskOccurrences(models.Model):
             self.task = task
         if name is not None:
             self.name = name
-
-        if category is not None:
-            self.task_category = category
 
         if priority_level is not None:
             self.priority_level = priority_level
