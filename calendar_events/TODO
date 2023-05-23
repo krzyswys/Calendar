@@ -12,3 +12,4 @@
 # NOTE: do not allow to change occurence category <- Deleted possibility to change occurrence category from modify method
 # NOTE: timezone support is off
 # NOTE: consider if event/task could be 'abstract' and only occurences would be shown, then statistics could operate only on task/event_occurences <- I think that was the plan since the beginning :) That's why we have separated Events from EventsOccurrences (same for tasks)
+# NOTE : If I want to use default values during creation (event, task, etc.) I need to pass string 'None' as a value of the field
