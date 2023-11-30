@@ -1,31 +1,25 @@
-- efficency wzgledem prioryty level dla każdego zadania
-- efficency bez prioryty level dla każdego zadania
-- ile zadan zrobionych na czas deadline z danym priorytetem
-- ile zadan zrobionych na podczas slidetime z danym priorytetem
+Efficiency in relation to priority level for each task
+Efficiency without considering priority level for each task
+Number of tasks completed on time with a given priority
+Number of tasks completed within the slide time with a given priority
+Total number of tasks completed on time before the deadline
+Total number of tasks completed within the slide time
+Number of tasks completed up to the expected completion
+Check what percentage of tasks in a given category is completed within different timeframes (until now / overall) (deadline, slide, expected completion)
+Average delay for tasks in a specific category concerning different timeframes (deadline, slide, expected completion)
+Average delay for tasks at a specific priority level concerning different timeframes (deadline, slide, expected completion)
+Amount of time tasks from a specific category take
+Amount of time tasks at a specific priority level take
+Total time taken by events from a specific category
+Percentage of events in a specific location
+Percentage of events with a particular priority level
 
-- ile ogolem zadan zrobionych na czas deadlien
-- ill ogólem zadan zrobionych na czas slidetime
-- ile zadan zrobionych do expected_completion
+Subtasks:
 
-- sprawdzić ile % zadań danej kategorii jest robionych na jaki czas (do teraz/wszystko) (dealine, slide, expected_completion)
-
-- średnia obsuwa dla zadań w danej kategorii wzgledem różnych czasów(dealine, slide, expected_completion)
-
-- średnia obsuwa dla zadań w danym priorytecie wzgledem różnych czasów(dealine, slide, expected_completion)
-
-- ile czasu zajmują zadania z danej kategorii
-- ile czasu zajmują zadania z danym priorytetem
-
-
-- ile czasu sumarycznie zajmują eventy danej kategorii
-- % eventow  w danej lokalizacji
-- % eventow o danym priority level
-
-Podzadania:
-- Całkowity czas spędzony na zadanie + jego podzadania
-- Procent wykonania zadania, wliczając jego podzadania (100 * liczba wykonanych podzadań / liczba wszystkich podzadań)
-- Zadanie + jego podzadania - ile zostało wykonanych w oczekiwanym czasie, ile w oczekiwanym czasie plus poślizg, ile przed deadline, ile po deadline
-- Średni czas pomiędzy wykonaniem podzadań, a ich oczekiwaną datą wykonania
-- Średni czas pomiedzy wykonaniem podzadań, a ich oczekiwaną datą wykonania + poślizg (jeśli zostały wykonane po oczekiwanej dacie)
-- Średni czas pomiędzy wykonaniem podzadań, a ich deadline (jeśli nie zostały wykonane do oczekiwanej daty + poślizg)
-- Średni czas pomiędzy deadlinem, a wykonaniem podzadań (jeśli zostały wykonane po deadline)
+Total time spent on a task + its subtasks
+Percentage of task completion, including its subtasks (100 * number of completed subtasks / total number of subtasks)
+Task + its subtasks - how many were completed within the expected time, how many within the expected time plus a delay, how many before the deadline, how many after the deadline
+Average time between completing subtasks and their expected completion date
+Average time between completing subtasks and their expected completion date + delay (if completed after the expected date)
+Average time between completing subtasks and their deadline (if not completed by the expected date + delay)
+Average time between the deadline and completing subtasks (if completed after the deadline)
