@@ -1,4 +1,5 @@
 # Calendar
+<h2 style="text-align: center"> Idea of the project was to create a calendaer API which can calculate many performance metrics and give usefull insigths into how time is spend on activities. Whole list of metrics can be found in statistics list.txt.</h2>
 In order to run with dummy data and html view:
 - python manage.py collectstatic
 - python manage.py makemigrations calendar_events
